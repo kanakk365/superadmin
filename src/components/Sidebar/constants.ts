@@ -1,0 +1,42 @@
+import {
+  IconBag,
+  IconBriefcase,
+  IconChat,
+  IconDot,
+  IconDocument,
+  IconGrid,
+  IconLayers,
+  IconPlay,
+  IconSettings,
+  IconUser,
+} from "@/lib/icons";
+import type { NavSection } from "./types";
+
+export const navSections: NavSection[] = [
+  {
+    title: "Projects",
+    items: [
+      { label: "Destination KP", icon: IconLayers, href: "/destination-kp" },
+      { label: "YSN", icon: IconPlay, href: "/ysn" },
+      { label: "GameReel", icon: IconGrid, href: "/game-reel" },
+      { label: "Battle Lounge", icon: IconUser, href: "/battle-lounge" },
+    ],
+  },
+];
+
+export const getInitialActiveItemKey = (pathname: string) => {
+  for (const section of navSections) {
+    for (const item of section.items) {
+      const itemKey = `${section.title}-${item.label}`;
+      if (item.href && item.href === pathname) {
+        return itemKey;
+      }
+      if (item.active) {
+        return itemKey;
+      }
+    }
+  }
+  const firstSection = navSections[0];
+  const firstItem = firstSection?.items[0];
+  return firstItem ? `${firstSection.title}-${firstItem.label}` : "";
+};
