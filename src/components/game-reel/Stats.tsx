@@ -7,30 +7,36 @@ const stats = [
     value: "12.5K",
     change: "+15%",
     tone: "positive" as const,
-    accentClass: "bg-[#e3f5ff] dark:bg-[#d7ebff]",
-    darkTextClass: "dark:text-[#1c1c1c]",
+    accentClass: "bg-gradient-to-br from-primary via-primary to-[#e2e2f5]",
+    textClass: "text-white",
+    badgeClass: "text-white",
   },
   {
     label: "Active Users",
     value: "8,240",
     change: "+8%",
     tone: "positive" as const,
-    accentClass: "bg-[#f7f9fb] dark:bg-[#282828]",
+    accentClass: "bg-card",
+    textClass: "text-foreground",
+    badgeClass: "text-[#1C1C1C] dark:text-white",
   },
   {
     label: "Total Posts",
     value: "45.1K",
     change: "+22%",
     tone: "positive" as const,
-    accentClass: "bg-[#f7f9fb] dark:bg-[#282828]",
+    accentClass: "bg-card",
+    textClass: "text-foreground",
+    badgeClass: "text-[#1C1C1C] dark:text-white",
   },
   {
     label: "Total Reach",
     value: "1.2M",
     change: "+45%",
     tone: "positive" as const,
-    accentClass: "bg-[#e5ecf6] dark:bg-[#dbe5ff]",
-    darkTextClass: "dark:text-[#1c1c1c]",
+    accentClass: "bg-gradient-to-br from-primary via-primary to-[#e2e2f5]",
+    textClass: "text-white",
+    badgeClass: "text-white",
   },
 ];
 
@@ -42,22 +48,22 @@ export const GameReelStats = () => {
           key={stat.label}
           className={`flex flex-col gap-5 rounded-[24px] px-6 py-6 ${stat.accentClass}`}
         >
-          <p
-            className={cn("text-xl font-medium text-foreground", stat.darkTextClass)}
-          >
+          <p className={cn("text-xl font-medium", stat.textClass)}>
             {stat.label}
           </p>
           <div
             className={cn(
-              "flex items-baseline justify-between gap-2 text-foreground",
-              stat.darkTextClass
+              "flex items-baseline justify-between gap-2",
+              stat.textClass
             )}
           >
-            <span className="text-4xl font-semibold tracking-tight">{stat.value}</span>
+            <span className="text-4xl font-semibold tracking-tight">
+              {stat.value}
+            </span>
             <TrendBadge
               change={stat.change}
               tone={stat.tone}
-              className={stat.darkTextClass ? "dark:text-[#1c1c1c] trend" : "dark:text-white trend"}
+              className={stat.badgeClass}
             />
           </div>
         </div>
@@ -65,4 +71,3 @@ export const GameReelStats = () => {
     </div>
   );
 };
-

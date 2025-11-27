@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
+import * as React from "react";
+import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
 import {
   Card,
@@ -9,7 +9,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
@@ -17,14 +17,14 @@ import {
   ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
+} from "@/components/ui/chart";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 
 const chartData = [
   { date: "2024-04-01", likes: 222, comments: 150 },
@@ -118,7 +118,7 @@ const chartData = [
   { date: "2024-06-28", likes: 149, comments: 200 },
   { date: "2024-06-29", likes: 103, comments: 160 },
   { date: "2024-06-30", likes: 446, comments: 400 },
-]
+];
 
 const chartConfig = {
   visitors: {
@@ -127,35 +127,35 @@ const chartConfig = {
   likes: {
     label: "Likes",
     theme: {
-      light: "#9DB9D5",
-      dark: "#a8c5da",
+      light: "oklch(0.5417 0.1790 288.0332)",
+      dark: "oklch(0.7162 0.1597 290.3962)",
     },
   },
   comments: {
     label: "Comments",
     theme: {
-      light: "#CEDCEB",
-      dark: "#687681",
+      light: "oklch(0.5679 0.2113 276.7065)",
+      dark: "oklch(0.7482 0.1235 244.7492)",
     },
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 export function EngagementAreaChart() {
-  const [timeRange, setTimeRange] = React.useState("90d")
+  const [timeRange, setTimeRange] = React.useState("90d");
 
   const filteredData = chartData.filter((item) => {
-    const date = new Date(item.date)
-    const referenceDate = new Date("2024-06-30")
-    let daysToSubtract = 90
+    const date = new Date(item.date);
+    const referenceDate = new Date("2024-06-30");
+    let daysToSubtract = 90;
     if (timeRange === "30d") {
-      daysToSubtract = 30
+      daysToSubtract = 30;
     } else if (timeRange === "7d") {
-      daysToSubtract = 7
+      daysToSubtract = 7;
     }
-    const startDate = new Date(referenceDate)
-    startDate.setDate(startDate.getDate() - daysToSubtract)
-    return date >= startDate
-  })
+    const startDate = new Date(referenceDate);
+    startDate.setDate(startDate.getDate() - daysToSubtract);
+    return date >= startDate;
+  });
 
   return (
     <Card className="pt-0">
@@ -226,11 +226,11 @@ export function EngagementAreaChart() {
               tickMargin={8}
               minTickGap={32}
               tickFormatter={(value) => {
-                const date = new Date(value)
+                const date = new Date(value);
                 return date.toLocaleDateString("en-US", {
                   month: "short",
                   day: "numeric",
-                })
+                });
               }}
             />
             <ChartTooltip
@@ -241,7 +241,7 @@ export function EngagementAreaChart() {
                     return new Date(value).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
-                    })
+                    });
                   }}
                   indicator="dot"
                 />
@@ -266,6 +266,5 @@ export function EngagementAreaChart() {
         </ChartContainer>
       </CardContent>
     </Card>
-  )
+  );
 }
-

@@ -38,15 +38,15 @@ const chartConfig = {
   digital: {
     label: "Digital Interest",
     theme: {
-      light: "#111827", // dark color
-      dark: "#c6c7f8",
+      light: "oklch(0.5417 0.1790 288.0332)",
+      dark: "oklch(0.7162 0.1597 290.3962)",
     },
   },
   campus: {
     label: "On-site",
     theme: {
-      light: "#91B7F9", // light blue
-      dark: "#a8c5da",
+      light: "oklch(0.5679 0.2113 276.7065)",
+      dark: "oklch(0.7482 0.1235 244.7492)",
     },
   },
 } satisfies ChartConfig;
@@ -68,79 +68,92 @@ export const GuestChannelsChart = () => {
           </span>
         </div>
       </div>
-      
+
       <div className="h-[300px] w-full">
-        <ChartContainer
-            config={chartConfig}
-            className="h-full w-full"
-        >
-            <RechartsLineChart
+        <ChartContainer config={chartConfig} className="h-full w-full">
+          <RechartsLineChart
             data={chartData}
             margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
-            >
+          >
             <defs>
-                <linearGradient id="fillDigital" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="var(--color-digital)" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="var(--color-digital)" stopOpacity={0.1} />
-                </linearGradient>
-                <linearGradient id="fillCampus" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="var(--color-campus)" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="var(--color-campus)" stopOpacity={0.1} />
-                </linearGradient>
+              <linearGradient id="fillDigital" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-digital)"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-digital)"
+                  stopOpacity={0.1}
+                />
+              </linearGradient>
+              <linearGradient id="fillCampus" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-campus)"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-campus)"
+                  stopOpacity={0.1}
+                />
+              </linearGradient>
             </defs>
 
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--line-grid-stroke)" />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              vertical={false}
+              stroke="var(--line-grid-stroke)"
+            />
             <XAxis
-                dataKey="date"
-                axisLine={false}
-                tickLine={false}
-                tickMargin={12}
-                padding={{ left: 10, right: 10 }}
+              dataKey="date"
+              axisLine={false}
+              tickLine={false}
+              tickMargin={12}
+              padding={{ left: 10, right: 10 }}
             />
             <YAxis
-                axisLine={false}
-                tickLine={false}
-                tickMargin={16}
-                padding={{ top: 20, bottom: 20 }}
+              axisLine={false}
+              tickLine={false}
+              tickMargin={16}
+              padding={{ top: 20, bottom: 20 }}
             />
-            <ChartTooltip
-                cursor={false}
-                content={<ChartTooltipContent />}
-            />
-            
+            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+
             <Area
-                type="monotone"
-                dataKey="digital"
-                stroke="none"
-                fill="url(#fillDigital)"
-                fillOpacity={0.6}
+              type="monotone"
+              dataKey="digital"
+              stroke="none"
+              fill="url(#fillDigital)"
+              fillOpacity={0.6}
             />
             <Area
-                type="monotone"
-                dataKey="campus"
-                stroke="none"
-                fill="url(#fillCampus)"
-                fillOpacity={0.6}
+              type="monotone"
+              dataKey="campus"
+              stroke="none"
+              fill="url(#fillCampus)"
+              fillOpacity={0.6}
             />
 
             <Line
-                type="monotone"
-                dataKey="digital"
-                stroke="var(--color-digital)"
-                strokeWidth={2}
-                dot={false}
+              type="monotone"
+              dataKey="digital"
+              stroke="var(--color-digital)"
+              strokeWidth={2}
+              dot={false}
             />
             <Line
-                type="monotone"
-                dataKey="campus"
-                stroke="var(--color-campus)"
-                strokeWidth={2}
-                dot={false}
+              type="monotone"
+              dataKey="campus"
+              stroke="var(--color-campus)"
+              strokeWidth={2}
+              dot={false}
             />
-            </RechartsLineChart>
+          </RechartsLineChart>
         </ChartContainer>
       </div>
     </div>
   );
 };
-

@@ -1,7 +1,9 @@
 import { YSNStats } from "./Stats";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { RevenueChart } from "../dashboard/RevenueChart";
-import { RecentMatches } from "./RecentMatches";
+import { YSNRevenueChart } from "./RevenueChart";
+import { MatchesTable } from "./MatchesTable";
+import { TopPlayers } from "./TopPlayers";
+import { MatchesChart } from "./MatchesChart";
 
 export const YSN = () => {
   return (
@@ -11,17 +13,21 @@ export const YSN = () => {
           <h1 className="text-lg font-semibold text-foreground">YSN Sports</h1>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
+        <div className="grid gap-6">
           <YSNStats />
-          <RevenueChart />
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
-          <RecentMatches />
+        <div className="grid gap-6 lg:grid-cols-2">
+          <YSNRevenueChart />
+          <MatchesChart />
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          <MatchesTable />
+          <TopPlayers />
         </div>
       </div>
       <ScrollBar />
     </ScrollArea>
   );
 };
-

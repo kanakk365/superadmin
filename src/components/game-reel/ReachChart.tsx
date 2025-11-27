@@ -34,8 +34,8 @@ const chartConfig = {
   reach: {
     label: "Reach",
     theme: {
-      light: "#7a1dc3",
-      dark: "#a855f7",
+      light: "oklch(0.5417 0.1790 288.0332)",
+      dark: "oklch(0.7162 0.1597 290.3962)",
     },
   },
 } satisfies ChartConfig;

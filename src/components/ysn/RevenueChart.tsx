@@ -17,18 +17,18 @@ import {
 } from "recharts";
 
 const chartData = [
-  { month: "Jan", attendees: 1200, projected: 1000 },
-  { month: "Feb", attendees: 1500, projected: 1300 },
-  { month: "Mar", attendees: 1800, projected: 1700 },
-  { month: "Apr", attendees: 2200, projected: 2000 },
-  { month: "May", attendees: 2500, projected: 2400 },
-  { month: "Jun", attendees: 3000, projected: 2800 },
-  { month: "Jul", attendees: 3500, projected: 3200 },
+  { month: "Jan", revenue: 12000, projected: 10000 },
+  { month: "Feb", revenue: 15000, projected: 13000 },
+  { month: "Mar", revenue: 18000, projected: 17000 },
+  { month: "Apr", revenue: 22000, projected: 20000 },
+  { month: "May", revenue: 25000, projected: 24000 },
+  { month: "Jun", revenue: 30000, projected: 28000 },
+  { month: "Jul", revenue: 35000, projected: 32000 },
 ];
 
 const chartConfig = {
-  attendees: {
-    label: "Attendees",
+  revenue: {
+    label: "Revenue",
     theme: {
       light: "oklch(0.5417 0.1790 288.0332)",
       dark: "oklch(0.7162 0.1597 290.3962)",
@@ -43,18 +43,16 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export const EventsChart = () => {
+export const YSNRevenueChart = () => {
   return (
     <div className="rounded-3xl bg-card py-6 px-3 h-full">
       <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground px-3 mb-8">
-        <p className="text-lg font-semibold text-foreground">
-          Event Attendance Trends
-        </p>
+        <p className="text-lg font-semibold text-foreground">Revenue Trends</p>
         <span className="hidden h-4 w-px bg-border md:block" />
         <div className="flex items-center gap-6">
           <span className="flex items-center gap-2 whitespace-nowrap">
-            <span className="h-2 w-2 rounded-full bg-[var(--color-attendees)]" />
-            <span className="text-sm text-foreground">Attendees</span>
+            <span className="h-2 w-2 rounded-full bg-[var(--color-revenue)]" />
+            <span className="text-sm text-foreground">Revenue</span>
           </span>
           <span className="flex items-center gap-2 whitespace-nowrap">
             <span className="h-2 w-2 rounded-full bg-[var(--color-projected)]" />
@@ -70,15 +68,15 @@ export const EventsChart = () => {
             margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
           >
             <defs>
-              <linearGradient id="fillAttendees" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="fillRevenue" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
-                  stopColor="var(--color-attendees)"
+                  stopColor="var(--color-revenue)"
                   stopOpacity={0.8}
                 />
                 <stop
                   offset="95%"
-                  stopColor="var(--color-attendees)"
+                  stopColor="var(--color-revenue)"
                   stopOpacity={0.1}
                 />
               </linearGradient>
@@ -118,9 +116,9 @@ export const EventsChart = () => {
 
             <Area
               type="monotone"
-              dataKey="attendees"
+              dataKey="revenue"
               stroke="none"
-              fill="url(#fillAttendees)"
+              fill="url(#fillRevenue)"
               fillOpacity={0.6}
             />
             <Area
@@ -133,8 +131,8 @@ export const EventsChart = () => {
 
             <Line
               type="monotone"
-              dataKey="attendees"
-              stroke="var(--color-attendees)"
+              dataKey="revenue"
+              stroke="var(--color-revenue)"
               strokeWidth={2}
               dot={false}
             />

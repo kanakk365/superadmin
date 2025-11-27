@@ -1,7 +1,8 @@
 import { BattleLoungeStats } from "./Stats";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { RevenueChart } from "../dashboard/RevenueChart";
 import { TournamentList } from "./TournamentList";
+import { BattleLoungeReachChart } from "./BattleLoungeReachChart";
+import { PopularGamesPie } from "./PopularGamesPie";
 
 export const BattleLounge = () => {
   return (
@@ -11,17 +12,20 @@ export const BattleLounge = () => {
           <h1 className="text-lg font-semibold text-foreground">Battle Lounge</h1>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
+        <div className="w-full">
           <BattleLoungeStats />
-          <RevenueChart />
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
           <TournamentList />
+          <PopularGamesPie />
+        </div>
+
+        <div className="grid gap-6 grid-cols-1">
+          <BattleLoungeReachChart />
         </div>
       </div>
       <ScrollBar />
     </ScrollArea>
   );
 };
-
