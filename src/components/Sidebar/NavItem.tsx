@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
-import { IconChevronDown, IconDot } from "@/lib/icons";
+import { IconDot } from "@/lib/icons";
 import type { NavItem } from "./types";
 
 interface NavItemProps {
@@ -82,12 +82,7 @@ export const NavItemComponent = ({
   const iconClasses = isHighlighted
     ? "bg-sidebar-accent text-sidebar-foreground"
     : "bg-muted text-muted-foreground";
-  const shouldShowChevron =
-    isSidebarOpen && !isDotNav && !isFavoritesSection && !isDefaultItem && !isOrdersItem;
-  const shouldReserveChevronSpace =
-    isSidebarOpen && !isDotNav && !isFavoritesSection && (isDefaultItem || isOrdersItem);
-  const iconOffsetClass =
-    shouldShowChevron || shouldReserveChevronSpace ? "-ml-1" : "";
+  const iconOffsetClass = "";
 
   const handleClick = () => {
     onSetActiveItemKey(itemKey);
@@ -99,20 +94,7 @@ export const NavItemComponent = ({
     }
   };
 
-  const chevronMarkup =
-    isSidebarOpen && !isDotNav && !isFavoritesSection ? (
-      shouldShowChevron ? (
-        <span className="relative z-10 flex h-4 w-4 items-center justify-center text-muted-foreground">
-          <IconChevronDown
-            className={`h-4 w-4 transition-transform ${
-              isExpandable && isItemExpanded ? "rotate-0" : "-rotate-90"
-            }`}
-          />
-        </span>
-      ) : shouldReserveChevronSpace ? (
-        <span className="relative z-10 flex h-4 w-4" aria-hidden="true" />
-      ) : null
-    ) : null;
+  const chevronMarkup = null;
 
   return (
     <div key={item.label} className="flex flex-col">

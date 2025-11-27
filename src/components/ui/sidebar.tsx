@@ -93,8 +93,13 @@ export const DesktopSidebar = ({
           "hidden h-full shrink-0 md:flex md:flex-col",
           className
         )}
+        initial={false}
         animate={{
           width: animate ? (open ? expandedWidth : collapsedWidth) : expandedWidth,
+        }}
+        transition={{
+          duration: 0.2,
+          ease: "easeInOut",
         }}
         {...props}
       >

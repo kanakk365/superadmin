@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback, memo } from "react";
 import { motion } from "motion/react";
 import { AnimatePresence } from "motion/react";
 import {
@@ -34,7 +34,7 @@ const Navbar = ({ sectionLabel, pageLabel }: NavbarProps) => {
     [theme]
   );
 
-  const triggerAnimation = (iconName: string, callback?: () => void) => {
+  const triggerAnimation = useCallback((iconName: string, callback?: () => void) => {
     setAnimatingIcons((prev) => new Set(prev).add(iconName));
     if (callback) callback();
     
@@ -45,18 +45,38 @@ const Navbar = ({ sectionLabel, pageLabel }: NavbarProps) => {
         return newSet;
       });
     }, 600);
-  };
+  }, []);
 
-  const isAnimating = (iconName: string) => animatingIcons.has(iconName);
+  const isAnimating = useCallback((iconName: string) => animatingIcons.has(iconName), [animatingIcons]);
+  
+  const handleSidebarToggle = useCallback(() => {
+    triggerAnimation("menu-left", toggleSidebar);
+  }, [triggerAnimation, toggleSidebar]);
+  
+  const handleNotificationsToggle = useCallback(() => {
+    triggerAnimation("bell", toggleNotifications);
+  }, [triggerAnimation, toggleNotifications]);
+  
+  const handleThemeToggle = useCallback(() => {
+    if (isLoaded) {
+      triggerAnimation("theme", toggleTheme);
+    }
+  }, [isLoaded, triggerAnimation, toggleTheme]);
+  
+  const handleClockClick = useCallback(() => {
+    triggerAnimation("clock");
+  }, [triggerAnimation]);
+  
+  const handleSearchClick = useCallback(() => {
+    triggerAnimation("search");
+  }, [triggerAnimation]);
 
   return (
     <header className="flex h-16 items-center justify-between border-b border-border bg-background px-4 sm:px-8 sm:pl-4">
       <div className="flex items-center gap-3">
         <motion.button
           type="button"
-          onClick={() => {
-            triggerAnimation("menu-left", toggleSidebar);
-          }}
+          onClick={handleSidebarToggle}
           whileTap={{ scale: 0.9 }}
           className="grid h-11 w-11 cursor-pointer place-items-center text-foreground transition "
         >
@@ -84,7 +104,7 @@ const Navbar = ({ sectionLabel, pageLabel }: NavbarProps) => {
           <input
             type="text"
             placeholder="Search"
-            onClick={() => triggerAnimation("search")}
+            onClick={handleSearchClick}
             className="h-10 w-60 rounded-lg bg-muted pl-10 pr-20 text-sm text-foreground outline-none transition focus:border-primary"
           />
           <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">
@@ -92,7 +112,7 @@ const Navbar = ({ sectionLabel, pageLabel }: NavbarProps) => {
           </span>
         </div>
         <motion.button
-          onClick={() => triggerAnimation("clock")}
+          onClick={handleClockClick}
           animate={isAnimating("clock") ? { rotate: [0, 360] } : { rotate: 0 }}
           transition={{ duration: 0.6, ease: "easeInOut" }}
           className="grid place-items-center text-foreground transition cursor-pointer"
@@ -100,11 +120,7 @@ const Navbar = ({ sectionLabel, pageLabel }: NavbarProps) => {
           <IconClock />
         </motion.button>
         <motion.button
-          onClick={() => {
-            if (isLoaded) {
-              triggerAnimation("theme", toggleTheme);
-            }
-          }}
+          onClick={handleThemeToggle}
           
           transition={{ duration: 0.3, ease: "easeInOut" }}
           className="grid place-items-center text-foreground transition cursor-pointer w-5 h-5 "
@@ -126,9 +142,7 @@ const Navbar = ({ sectionLabel, pageLabel }: NavbarProps) => {
         </motion.button>
         <motion.button
           type="button"
-          onClick={() => {
-            triggerAnimation("bell", toggleNotifications);
-          }}
+          onClick={handleNotificationsToggle}
           animate={isAnimating("bell") ? { x: [-2, 2, 0] } : { x: 0 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
           className="grid place-items-center text-foreground transition cursor-pointer"
@@ -138,9 +152,7 @@ const Navbar = ({ sectionLabel, pageLabel }: NavbarProps) => {
         </motion.button>
         <motion.button
           type="button"
-          onClick={() => {
-            triggerAnimation("menu-right", toggleSidebar);
-          }}
+          onClick={handleSidebarToggle}
           whileTap={{ scale: 0.9 }}
           className="hidden md:grid place-items-center text-foreground transition cursor-pointer"
         >
