@@ -35,12 +35,6 @@ const upcomingMatches = [
     date: "Dec 03, 2025",
     time: "19:00",
   },
-  {
-    match: "Tigers vs Lions",
-    league: "Premier League",
-    date: "Dec 05, 2025",
-    time: "17:45",
-  },
 ];
 
 const recentMatches = [
@@ -48,7 +42,6 @@ const recentMatches = [
   { match: "Eagles vs Sharks", league: "Championship", viewers: "8.2K", result: "0 - 0" },
   { match: "Rockets vs Comets", league: "Super Cup", viewers: "15.1K", result: "Pending" },
   { match: "Titans vs Giants", league: "Qualifier", viewers: "5.6K", result: "3 - 2" },
-  { match: "Wolves vs Bears", league: "Friendly", viewers: "2.1K", result: "1 - 4" },
 ];
 
 export const MatchesTable = () => {

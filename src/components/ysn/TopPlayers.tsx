@@ -4,6 +4,7 @@ const players = [
   { name: "Chris Lee", team: "Rockets", goals: 10, assists: 12 },
   { name: "Pat Taylor", team: "Wolves", goals: 14, assists: 5 },
   { name: "Jordan Brown", team: "Titans", goals: 11, assists: 9 },
+  { name: "Morgan Davis", team: "Lions", goals: 13, assists: 7 },
 ];
 
 export const TopPlayers = () => {

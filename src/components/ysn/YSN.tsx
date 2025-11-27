@@ -19,12 +19,12 @@ export const YSN = () => {
 
         <div className="grid gap-6 lg:grid-cols-2">
           <YSNRevenueChart />
-          <MatchesChart />
+          <TopPlayers />
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
           <MatchesTable />
-          <TopPlayers />
+          <MatchesChart />
         </div>
       </div>
       <ScrollBar />
