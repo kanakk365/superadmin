@@ -92,7 +92,7 @@ export const MatchesTable = () => {
                     {item.date}
                   </td>
                   <td className="px-6 py-3 text-sm font-normal text-foreground">
-                    <span className="inline-flex items-center rounded-full bg-violet-100 px-2.5 py-0.5 text-xs font-medium text-violet-800 dark:bg-violet-500/20 dark:text-violet-300">
+                    <span className="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300">
                       {item.time}
                     </span>
                   </td>

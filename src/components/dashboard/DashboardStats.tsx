@@ -11,21 +11,21 @@ export const DashboardStats = () => {
           className={`flex flex-col gap-5 rounded-[24px] px-6 py-6 ${stat.accentClass}`}
         >
           <p
-            className={cn("text-xl font-medium text-foreground", stat.darkTextClass)}
+            className={cn("text-xl font-medium", stat.textClass || "text-foreground")}
           >
             {stat.label}
           </p>
           <div
             className={cn(
-              "flex items-baseline justify-between gap-2 text-foreground",
-              stat.darkTextClass
+              "flex items-baseline justify-between gap-2",
+              stat.textClass || "text-foreground"
             )}
           >
             <span className="text-4xl font-semibold tracking-tight">{stat.value}</span>
             <TrendBadge
               change={stat.change}
               tone={stat.tone}
-              className={stat.darkTextClass ? "dark:text-[#1c1c1c] trend" : "dark:text-white trend"}
+              className={stat.badgeClass || "text-foreground dark:text-white"}
             />
           </div>
         </div>

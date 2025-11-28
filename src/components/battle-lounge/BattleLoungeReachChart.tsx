@@ -127,15 +127,15 @@ const chartConfig = {
   reach: {
     label: "Reach",
     theme: {
-      light: "oklch(0.5417 0.1790 288.0332)",
-      dark: "oklch(0.7162 0.1597 290.3962)",
+      light: "oklch(0.715 0.143 215.221)", // cyan-500
+      dark: "oklch(0.715 0.143 215.221)",
     },
   },
   impressions: {
     label: "Impressions",
     theme: {
-      light: "oklch(0.5679 0.2113 276.7065)",
-      dark: "oklch(0.7482 0.1235 244.7492)",
+      light: "oklch(0.738 0.132 237.251)", // sky-500
+      dark: "oklch(0.738 0.132 237.251)",
     },
   },
 } satisfies ChartConfig;

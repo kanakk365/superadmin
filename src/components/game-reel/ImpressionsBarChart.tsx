@@ -41,8 +41,8 @@ const chartConfig = {
   impressions: {
     label: "Impressions",
     theme: {
-      light: "oklch(0.5417 0.1790 288.0332)",
-      dark: "oklch(0.7162 0.1597 290.3962)",
+      light: "oklch(0.558 0.288 302.321)", // violet-500
+      dark: "oklch(0.558 0.288 302.321)",
     },
   },
 } satisfies ChartConfig;

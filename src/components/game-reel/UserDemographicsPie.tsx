@@ -32,22 +32,22 @@ const chartConfig = {
   male: {
     label: "Male",
     theme: {
-      light: "oklch(0.5417 0.1790 288.0332)",
-      dark: "oklch(0.7162 0.1597 290.3962)",
+      light: "oklch(0.546 0.245 291.338)", // purple-600
+      dark: "oklch(0.546 0.245 291.338)",
     },
   },
   female: {
     label: "Female",
     theme: {
-      light: "oklch(0.5679 0.2113 276.7065)",
-      dark: "oklch(0.7482 0.1235 244.7492)",
+      light: "oklch(0.558 0.288 302.321)", // violet-500
+      dark: "oklch(0.558 0.288 302.321)",
     },
   },
   others: {
     label: "Others",
     theme: {
-      light: "oklch(0.7042 0.1602 288.9880)",
-      dark: "oklch(0.6382 0.1047 274.9117)",
+      light: "oklch(0.714 0.203 292.243)", // purple-400
+      dark: "oklch(0.714 0.203 292.243)",
     },
   },
 } satisfies ChartConfig;

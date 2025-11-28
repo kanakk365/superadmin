@@ -127,15 +127,15 @@ const chartConfig = {
   likes: {
     label: "Likes",
     theme: {
-      light: "oklch(0.5417 0.1790 288.0332)",
-      dark: "oklch(0.7162 0.1597 290.3962)",
+      light: "oklch(0.546 0.245 291.338)", // purple-600
+      dark: "oklch(0.546 0.245 291.338)",
     },
   },
   comments: {
     label: "Comments",
     theme: {
-      light: "oklch(0.5679 0.2113 276.7065)",
-      dark: "oklch(0.7482 0.1235 244.7492)",
+      light: "oklch(0.656 0.256 299.841)", // violet-400
+      dark: "oklch(0.656 0.256 299.841)",
     },
   },
 } satisfies ChartConfig;

@@ -22,15 +22,15 @@ const chartConfig = {
   played: {
     label: "Played",
     theme: {
-      light: "oklch(0.5417 0.1790 288.0332)",
-      dark: "oklch(0.7162 0.1597 290.3962)",
+      light: "oklch(0.562 0.168 180.434)", // teal-600
+      dark: "oklch(0.562 0.168 180.434)",
     },
   },
   scheduled: {
     label: "Scheduled",
     theme: {
-      light: "oklch(0.5679 0.2113 276.7065)",
-      dark: "oklch(0.7482 0.1235 244.7492)",
+      light: "oklch(0.517 0.129 213.508)", // cyan-700
+      dark: "oklch(0.517 0.129 213.508)",
     },
   },
 } satisfies ChartConfig;

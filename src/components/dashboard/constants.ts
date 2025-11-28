@@ -4,8 +4,9 @@ export const stats = [
     value: "3,781",
     change: "+11.01%",
     tone: "positive" as const,
-    accentClass: "bg-[#e3f5ff] dark:bg-[#d7ebff]",
-    darkTextClass: "dark:text-[#1c1c1c]",
+    accentClass: "bg-gradient-to-br from-blue-500 via-indigo-500 to-[#e2e2f5]",
+    textClass: "text-white",
+    badgeClass: "text-white",
   },
   {
     label: "Orders",
@@ -26,8 +27,9 @@ export const stats = [
     value: "30.1%",
     change: "+6.08%",
     tone: "positive" as const,
-    accentClass: "bg-[#e5ecf6] dark:bg-[#dbe5ff]",
-    darkTextClass: "dark:text-[#1c1c1c]",
+    accentClass: "bg-gradient-to-br from-amber-400 via-orange-500 to-[#e2e2f5]",
+    textClass: "text-white",
+    badgeClass: "text-white",
   },
 ];
 

@@ -28,15 +28,15 @@ export const ProjectionsChart = () => {
           actual: {
             label: "Actual",
             theme: {
-              light: "#9DB9D5",
-              dark: "#a8c5da",
+              light: "#a855f7", // purple-500
+              dark: "#a855f7",
             },
           },
           projectedDelta: {
             label: "Projected",
             theme: {
-              light: "#CEDCEB",
-              dark: "#687681",
+              light: "#3b82f6", // blue-500
+              dark: "#3b82f6",
             },
           },
         }}

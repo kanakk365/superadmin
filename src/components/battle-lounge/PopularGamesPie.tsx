@@ -34,36 +34,36 @@ const chartConfig = {
   cod: {
     label: "Call of Duty",
     theme: {
-      light: "oklch(0.5417 0.1790 288.0332)",
-      dark: "oklch(0.7162 0.1597 290.3962)",
+      light: "oklch(0.715 0.143 215.221)", // cyan-500
+      dark: "oklch(0.715 0.143 215.221)",
     },
   },
   fortnite: {
     label: "Fortnite",
     theme: {
-      light: "oklch(0.5679 0.2113 276.7065)",
-      dark: "oklch(0.7482 0.1235 244.7492)",
+      light: "oklch(0.738 0.132 237.251)", // sky-500
+      dark: "oklch(0.738 0.132 237.251)",
     },
   },
   apex: {
     label: "Apex Legends",
     theme: {
-      light: "oklch(0.7042 0.1602 288.9880)",
-      dark: "oklch(0.6382 0.1047 274.9117)",
+      light: "oklch(0.623 0.214 259.815)", // blue-500
+      dark: "oklch(0.623 0.214 259.815)",
     },
   },
   valorant: {
     label: "Valorant",
     theme: {
-      light: "oklch(0.488 0.243 264.376)",
-      dark: "oklch(0.488 0.243 264.376)",
+      light: "oklch(0.552 0.096 245.331)", // indigo-500
+      dark: "oklch(0.552 0.096 245.331)",
     },
   },
   other: {
     label: "Other",
     theme: {
-      light: "oklch(0.87 0.02 240)",
-      dark: "oklch(0.87 0.02 240)",
+      light: "oklch(0.704 0.04 256.7)", // slate-400
+      dark: "oklch(0.704 0.04 256.7)",
     },
   },
 } satisfies ChartConfig;

@@ -29,22 +29,22 @@ const chartConfig = {
   previous: {
     label: "Previous Week",
     theme: {
-      light: "#91B7F9",
-      dark: "#a8c5da",
+      light: "#f97316", // orange-500
+      dark: "#f97316",
     },
   },
   current: {
     label: "Current Week",
     theme: {
-      light: "#111827",
-      dark: "#a8c5da",
+      light: "#10b981", // emerald-500
+      dark: "#10b981",
     },
   },
   currentProjection: {
     label: "Projected",
     theme: {
-      light: "#111827",
-      dark: "#c6c7f8",
+      light: "#10b981",
+      dark: "#10b981",
     },
   },
 } satisfies ChartConfig;
