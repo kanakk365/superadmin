@@ -36,7 +36,7 @@ export const TopPlayers = () => {
                   {item.team}
                 </td>
                 <td className="px-6 py-3 text-sm font-normal text-foreground">
-                  <span className="inline-flex items-center rounded-full bg-teal-100 px-2.5 py-0.5 text-xs font-medium text-teal-800 dark:bg-teal-500/20 dark:text-teal-300">
+                  <span className="inline-flex items-center rounded-full bg-pink-100 px-2.5 py-0.5 text-xs font-medium text-pink-800 dark:bg-pink-500/20 dark:text-pink-300">
                     {item.goals}
                   </span>
                 </td>

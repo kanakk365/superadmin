@@ -30,15 +30,15 @@ const chartConfig = {
   revenue: {
     label: "Revenue",
     theme: {
-      light: "oklch(0.488 0.148 179.659)", // teal-700
-      dark: "oklch(0.488 0.148 179.659)",
+      light: "oklch(0.718 0.202 349.761)", // pink-400
+      dark: "oklch(0.718 0.202 349.761)",
     },
   },
   projected: {
     label: "Projected",
     theme: {
-      light: "oklch(0.596 0.183 152.665)", // emerald-600
-      dark: "oklch(0.596 0.183 152.665)",
+      light: "oklch(0.696 0.17 291.124)", // purple-400
+      dark: "oklch(0.696 0.17 291.124)",
     },
   },
 } satisfies ChartConfig;

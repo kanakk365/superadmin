@@ -71,7 +71,7 @@ export const YSNStats = () => {
 
         {/* Revenue Card - Large with Gradient */}
         <div className="lg:col-span-2">
-          <div className="group h-full rounded-[32px] bg-gradient-to-br from-[#0d9488] via-[#14b8a6] to-[#2dd4bf] text-white p-8 lg:p-10 flex flex-col justify-between shadow-xl shadow-teal-500/10 relative overflow-hidden transition-all hover:shadow-2xl hover:shadow-teal-500/20">
+          <div className="group h-full rounded-[32px] bg-gradient-to-br from-pink-400 via-fuchsia-400 to-purple-400 text-white p-8 lg:p-10 flex flex-col justify-between shadow-xl shadow-pink-400/10 relative overflow-hidden transition-all hover:shadow-2xl hover:shadow-pink-400/20">
             <div className="flex flex-col gap-8 relative z-10 h-full">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-4">
@@ -118,10 +118,10 @@ export const YSNStats = () => {
                         backgroundColor: "rgba(255, 255, 255, 0.95)",
                         borderRadius: "16px",
                         border: "none",
-                        color: "#0d9488",
+                        color: "#f472b6",
                         boxShadow: "0 10px 30px -10px rgba(0,0,0,0.2)",
                       }}
-                      itemStyle={{ color: "#0d9488", fontWeight: 600 }}
+                      itemStyle={{ color: "#f472b6", fontWeight: 600 }}
                       cursor={{
                         stroke: "rgba(255,255,255,0.3)",
                         strokeWidth: 1,
@@ -164,7 +164,7 @@ export const YSNStats = () => {
 
             {/* Decorative background elements */}
             <div className="absolute -right-20 -top-20 w-80 h-80 bg-white/10 rounded-full blur-[80px] pointer-events-none mix-blend-overlay"></div>
-            <div className="absolute -left-20 bottom-0 w-60 h-60 bg-teal-900/20 rounded-full blur-[60px] pointer-events-none mix-blend-multiply"></div>
+            <div className="absolute -left-20 bottom-0 w-60 h-60 bg-pink-300/30 rounded-full blur-[60px] pointer-events-none mix-blend-multiply"></div>
           </div>
         </div>
       </div>
@@ -193,7 +193,7 @@ const StatCard = ({
     className={cn(
       "group flex flex-col justify-between gap-4 h-full rounded-[28px] p-5 lg:p-6 border transition-all duration-300 hover:-translate-y-1 hover:shadow-lg",
       highlight
-        ? "bg-gradient-to-br from-teal-600 to-teal-500 text-white border-transparent shadow-lg shadow-teal-500/25"
+        ? "bg-gradient-to-br from-pink-400 to-purple-400 text-white border-transparent shadow-lg shadow-pink-400/25"
         : "bg-card border-border/40 hover:border-border/80"
     )}
     style={{ animationDelay: `${delay}ms` }}

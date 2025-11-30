@@ -38,20 +38,47 @@ const upcomingMatches = [
 ];
 
 const recentMatches = [
-  { match: "Tigers vs Lions", league: "Premier League", viewers: "12.5K", result: "2 - 1" },
-  { match: "Eagles vs Sharks", league: "Championship", viewers: "8.2K", result: "0 - 0" },
-  { match: "Rockets vs Comets", league: "Super Cup", viewers: "15.1K", result: "Pending" },
-  { match: "Titans vs Giants", league: "Qualifier", viewers: "5.6K", result: "3 - 2" },
+  {
+    match: "Tigers vs Lions",
+    league: "Premier League",
+    viewers: "12.5K",
+    result: "2 - 1",
+  },
+  {
+    match: "Eagles vs Sharks",
+    league: "Championship",
+    viewers: "8.2K",
+    result: "0 - 0",
+  },
+  {
+    match: "Rockets vs Comets",
+    league: "Super Cup",
+    viewers: "15.1K",
+    result: "Pending",
+  },
+  {
+    match: "Titans vs Giants",
+    league: "Qualifier",
+    viewers: "5.6K",
+    result: "3 - 2",
+  },
 ];
 
 export const MatchesTable = () => {
-  const [matchType, setMatchType] = React.useState<"upcoming" | "recent">("upcoming");
+  const [matchType, setMatchType] = React.useState<"upcoming" | "recent">(
+    "upcoming"
+  );
 
   return (
     <div className="rounded-3xl bg-card py-6 px-3">
       <div className="flex items-center justify-between px-6 mb-4">
         <h3 className="text-lg font-semibold text-foreground">Matches</h3>
-        <Select value={matchType} onValueChange={(value) => setMatchType(value as "upcoming" | "recent")}>
+        <Select
+          value={matchType}
+          onValueChange={(value) =>
+            setMatchType(value as "upcoming" | "recent")
+          }
+        >
           <SelectTrigger className="w-[160px] rounded-lg">
             <SelectValue />
           </SelectTrigger>
@@ -92,7 +119,7 @@ export const MatchesTable = () => {
                     {item.date}
                   </td>
                   <td className="px-6 py-3 text-sm font-normal text-foreground">
-                    <span className="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300">
+                    <span className="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800 dark:bg-purple-500/20 dark:text-purple-300">
                       {item.time}
                     </span>
                   </td>
@@ -112,11 +139,22 @@ export const MatchesTable = () => {
             </thead>
             <tbody className="text-sm text-foreground">
               {recentMatches.map((item) => (
-                <tr key={item.match} className="border-b border-border/60 last:border-0">
-                  <td className="px-6 py-3 text-sm font-normal text-foreground">{item.match}</td>
-                  <td className="px-6 py-3 text-sm font-normal text-foreground">{item.league}</td>
-                  <td className="px-6 py-3 text-sm font-normal text-foreground">{item.viewers}</td>
-                  <td className="px-6 py-3 text-sm font-normal text-foreground">{item.result}</td>
+                <tr
+                  key={item.match}
+                  className="border-b border-border/60 last:border-0"
+                >
+                  <td className="px-6 py-3 text-sm font-normal text-foreground">
+                    {item.match}
+                  </td>
+                  <td className="px-6 py-3 text-sm font-normal text-foreground">
+                    {item.league}
+                  </td>
+                  <td className="px-6 py-3 text-sm font-normal text-foreground">
+                    {item.viewers}
+                  </td>
+                  <td className="px-6 py-3 text-sm font-normal text-foreground">
+                    {item.result}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -126,4 +164,3 @@ export const MatchesTable = () => {
     </div>
   );
 };
-

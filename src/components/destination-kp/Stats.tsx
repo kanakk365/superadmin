@@ -71,7 +71,7 @@ export const DestinationKPStats = () => {
 
         {/* Revenue Card - Large with Gradient */}
         <div className="lg:col-span-2">
-          <div className="group h-full rounded-[32px] bg-gradient-to-br from-[#bd5bf1] via-[#9b46e3] to-[#7a33e1] text-white p-8 lg:p-10 flex flex-col justify-between shadow-xl shadow-purple-500/10 relative overflow-hidden transition-all hover:shadow-2xl hover:shadow-purple-500/20">
+          <div className="group h-full rounded-[32px] bg-gradient-to-br from-indigo-400 via-purple-400 to-pink-400 text-white p-8 lg:p-10 flex flex-col justify-between shadow-xl shadow-indigo-400/10 relative overflow-hidden transition-all hover:shadow-2xl hover:shadow-indigo-400/20">
             <div className="flex flex-col gap-8 relative z-10 h-full">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-4">
@@ -118,10 +118,10 @@ export const DestinationKPStats = () => {
                         backgroundColor: "rgba(255, 255, 255, 0.95)",
                         borderRadius: "16px",
                         border: "none",
-                        color: "#7a33e1",
+                        color: "#818cf8",
                         boxShadow: "0 10px 30px -10px rgba(0,0,0,0.2)",
                       }}
-                      itemStyle={{ color: "#7a33e1", fontWeight: 600 }}
+                      itemStyle={{ color: "#818cf8", fontWeight: 600 }}
                       cursor={{
                         stroke: "rgba(255,255,255,0.3)",
                         strokeWidth: 1,
@@ -164,7 +164,7 @@ export const DestinationKPStats = () => {
 
             {/* Decorative background elements */}
             <div className="absolute -right-20 -top-20 w-80 h-80 bg-white/10 rounded-full blur-[80px] pointer-events-none mix-blend-overlay"></div>
-            <div className="absolute -left-20 bottom-0 w-60 h-60 bg-purple-900/20 rounded-full blur-[60px] pointer-events-none mix-blend-multiply"></div>
+            <div className="absolute -left-20 bottom-0 w-60 h-60 bg-indigo-300/30 rounded-full blur-[60px] pointer-events-none mix-blend-multiply"></div>
           </div>
         </div>
       </div>
@@ -193,7 +193,7 @@ const StatCard = ({
     className={cn(
       "group flex flex-col justify-between gap-4 h-full rounded-[28px] p-5 lg:p-6 border transition-all duration-300 hover:-translate-y-1 hover:shadow-lg",
       highlight
-        ? "bg-gradient-to-br from-primary to-primary/90 text-white border-transparent shadow-lg shadow-primary/25"
+        ? "bg-gradient-to-br from-indigo-400 to-purple-400 text-white border-transparent shadow-lg shadow-indigo-400/25"
         : "bg-card border-border/40 hover:border-border/80"
     )}
     style={{ animationDelay: `${delay}ms` }}
