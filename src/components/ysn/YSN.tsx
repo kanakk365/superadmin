@@ -9,20 +9,14 @@ export const YSN = () => {
   return (
     <ScrollArea className="h-full w-full">
       <div className="flex flex-col gap-8 px-3 sm:px-8 py-8">
-        <div>
-          <h1 className="text-lg font-semibold text-foreground">YSN Sports</h1>
-        </div>
+        <YSNStats />
 
-        <div className="grid gap-6">
-          <YSNStats />
-        </div>
-
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <YSNRevenueChart />
           <TopPlayers />
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <MatchesTable />
           <MatchesChart />
         </div>

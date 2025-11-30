@@ -58,7 +58,7 @@ export function UserDemographicsPie() {
   }, []);
 
   return (
-    <Card className="flex flex-col h-full">
+    <Card className="flex flex-col rounded-[32px] h-full">
       <CardHeader className="items-center pb-0">
         <CardTitle>User Demographics</CardTitle>
         <CardDescription>Male vs Female vs Others</CardDescription>

@@ -127,15 +127,15 @@ const chartConfig = {
   reach: {
     label: "Reach",
     theme: {
-      light: "oklch(0.715 0.143 215.221)", // cyan-500
-      dark: "oklch(0.715 0.143 215.221)",
+      light: "#bd5bf1",
+      dark: "#bd5bf1",
     },
   },
   impressions: {
     label: "Impressions",
     theme: {
-      light: "oklch(0.738 0.132 237.251)", // sky-500
-      dark: "oklch(0.738 0.132 237.251)",
+      light: "#7a33e1",
+      dark: "#7a33e1",
     },
   },
 } satisfies ChartConfig;
@@ -158,8 +158,8 @@ export function BattleLoungeReachChart() {
   });
 
   return (
-    <Card className="pt-0">
-      <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
+    <Card className="pt-0 rounded-[32px] ">
+      <CardHeader className="flex items-center gap-2 space-y-0 border-b py-8 sm:flex-row">
         <div className="grid flex-1 gap-1">
           <CardTitle>Reach & Impressions</CardTitle>
           <CardDescription>
@@ -268,4 +268,3 @@ export function BattleLoungeReachChart() {
     </Card>
   );
 }
-

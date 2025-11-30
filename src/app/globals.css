@@ -174,15 +174,6 @@ body {
   --line-tick-color: #9ca3af;
 }
 
-.dark svg:not(.recharts-surface):not(.trend) {
-  color: var(--foreground);
-}
-
-.dark svg:not(.recharts-surface):not(.rsm-svg):not(.trend) * {
-  fill: currentColor !important;
-  stroke: currentColor;
-}
-
 @layer base {
   * {
     @apply border-border outline-ring/50;

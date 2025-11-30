@@ -16,7 +16,6 @@ import { useNotificationPanelStore } from "@/store/notificationPanelStore";
 import { useTheme } from "@/components/providers/theme-provider";
 import { Moon } from "lucide-react";
 
-
 type NavbarProps = {
   sectionLabel: string;
   pageLabel: string;
@@ -24,8 +23,10 @@ type NavbarProps = {
 
 const Navbar = ({ sectionLabel, pageLabel }: NavbarProps) => {
   const toggleSidebar = useSidebarStore((state) => state.toggle);
-  const toggleNotifications = useNotificationPanelStore((state) => state.toggle);
-  
+  const toggleNotifications = useNotificationPanelStore(
+    (state) => state.toggle
+  );
+
   const [animatingIcons, setAnimatingIcons] = useState<Set<string>>(new Set());
   const { theme, toggleTheme, isLoaded } = useTheme();
 
@@ -34,39 +35,45 @@ const Navbar = ({ sectionLabel, pageLabel }: NavbarProps) => {
     [theme]
   );
 
-  const triggerAnimation = useCallback((iconName: string, callback?: () => void) => {
-    setAnimatingIcons((prev) => new Set(prev).add(iconName));
-    if (callback) callback();
-    
-    setTimeout(() => {
-      setAnimatingIcons((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(iconName);
-        return newSet;
-      });
-    }, 600);
-  }, []);
+  const triggerAnimation = useCallback(
+    (iconName: string, callback?: () => void) => {
+      setAnimatingIcons((prev) => new Set(prev).add(iconName));
+      if (callback) callback();
 
-  const isAnimating = useCallback((iconName: string) => animatingIcons.has(iconName), [animatingIcons]);
-  
+      setTimeout(() => {
+        setAnimatingIcons((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(iconName);
+          return newSet;
+        });
+      }, 600);
+    },
+    []
+  );
+
+  const isAnimating = useCallback(
+    (iconName: string) => animatingIcons.has(iconName),
+    [animatingIcons]
+  );
+
   const handleSidebarToggle = useCallback(() => {
     triggerAnimation("menu-left", toggleSidebar);
   }, [triggerAnimation, toggleSidebar]);
-  
+
   const handleNotificationsToggle = useCallback(() => {
     triggerAnimation("bell", toggleNotifications);
   }, [triggerAnimation, toggleNotifications]);
-  
+
   const handleThemeToggle = useCallback(() => {
     if (isLoaded) {
       triggerAnimation("theme", toggleTheme);
     }
   }, [isLoaded, triggerAnimation, toggleTheme]);
-  
+
   const handleClockClick = useCallback(() => {
     triggerAnimation("clock");
   }, [triggerAnimation]);
-  
+
   const handleSearchClick = useCallback(() => {
     triggerAnimation("search");
   }, [triggerAnimation]);
@@ -95,7 +102,11 @@ const Navbar = ({ sectionLabel, pageLabel }: NavbarProps) => {
         <div className="relative hidden sm:block">
           <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center">
             <motion.div
-              animate={isAnimating("search") ? { opacity: [1, 0.5, 1] } : { opacity: 1 }}
+              animate={
+                isAnimating("search")
+                  ? { opacity: [1, 0.5, 1] }
+                  : { opacity: 1 }
+              }
               transition={{ duration: 0.6, ease: "easeOut" }}
             >
               <IconSearch />
@@ -121,7 +132,6 @@ const Navbar = ({ sectionLabel, pageLabel }: NavbarProps) => {
         </motion.button>
         <motion.button
           onClick={handleThemeToggle}
-          
           transition={{ duration: 0.3, ease: "easeInOut" }}
           className="grid place-items-center text-foreground transition cursor-pointer w-5 h-5 "
           aria-label="Toggle theme"

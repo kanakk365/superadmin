@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Label, Pie, PieChart } from "recharts";
+import { Gamepad2 } from "lucide-react";
 
 import {
   Card,
@@ -34,15 +35,15 @@ const chartConfig = {
   cod: {
     label: "Call of Duty",
     theme: {
-      light: "oklch(0.715 0.143 215.221)", // cyan-500
-      dark: "oklch(0.715 0.143 215.221)",
+      light: "#bd5bf1",
+      dark: "#bd5bf1",
     },
   },
   fortnite: {
     label: "Fortnite",
     theme: {
-      light: "oklch(0.738 0.132 237.251)", // sky-500
-      dark: "oklch(0.738 0.132 237.251)",
+      light: "#7a33e1",
+      dark: "#7a33e1",
     },
   },
   apex: {
@@ -74,9 +75,9 @@ export function PopularGamesPie() {
   }, []);
 
   return (
-    <Card className="flex flex-col h-full">
-      <CardHeader className="items-center pb-0">
-        <CardTitle>Popular Games</CardTitle>
+    <Card className="flex flex-col h-full gap-10 rounded-[32px] border-border/40 shadow-sm overflow-hidden">
+      <CardHeader className="items-center pt-3">
+        <CardTitle className="text-xl">Popular Games</CardTitle>
         <CardDescription>Most played titles this month</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
@@ -93,8 +94,10 @@ export function PopularGamesPie() {
               data={chartData}
               dataKey="players"
               nameKey="game"
-              innerRadius={60}
+              innerRadius={90}
+              outerRadius={120}
               strokeWidth={5}
+              cy={125}
             >
               <Label
                 content={({ viewBox }) => {
@@ -126,14 +129,9 @@ export function PopularGamesPie() {
                 }}
               />
             </Pie>
-            <ChartLegend
-              content={<ChartLegendContent />}
-              className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
-            />
           </PieChart>
         </ChartContainer>
       </CardContent>
     </Card>
   );
 }
-

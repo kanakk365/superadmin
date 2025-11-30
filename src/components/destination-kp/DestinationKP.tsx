@@ -9,25 +9,14 @@ export const DestinationKP = () => {
   return (
     <ScrollArea className="h-full w-full">
       <div className="flex flex-col gap-8 px-3 sm:px-8 py-8">
-        <div>
-          <h1 className="text-lg font-semibold text-foreground">
-            Destination KP
-          </h1>
-        </div>
+        <DestinationKPStats />
 
-        <div className="grid gap-6">
-          {/* Top Stats Row */}
-          <DestinationKPStats />
-        </div>
-
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* Charts & Lists Row */}
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <GuestChannelsChart />
           <JobsList />
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* Bottom Row */}
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <UpcomingEvents />
           <EventsChart />
         </div>

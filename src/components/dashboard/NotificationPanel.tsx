@@ -4,9 +4,7 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  IconDot,
-} from "@/lib/icons";
+import { IconDot } from "@/lib/icons";
 import { Bug, User, Radio } from "lucide-react";
 import { useNotificationPanelStore } from "@/store/notificationPanelStore";
 import { cn } from "@/lib/utils";
@@ -33,28 +31,28 @@ const notifications: PanelItem[] = [
     id: "bug-1",
     title: "You have a bug that needs attention",
     timestamp: "Just now",
-    icon: <Bug className="h-4 w-4 text-neutral-900" />,
+    icon: <Bug className="h-4 w-4" />,
     accent: "bg-[#E5ECF6]",
   },
   {
     id: "user-registered",
     title: "New user registered",
     timestamp: "59 minutes ago",
-    icon: <User className="h-4 w-4 text-neutral-900" />,
+    icon: <User className="h-4 w-4" />,
     accent: "bg-[#E5ECF6]",
   },
   {
     id: "bug-2",
     title: "You have a bug that needs attention",
     timestamp: "12 hours ago",
-    icon: <Bug className="h-4 w-4 text-neutral-900" />,
+    icon: <Bug className="h-4 w-4" />,
     accent: "bg-[#E5ECF6]",
   },
   {
     id: "subscription",
     title: "Andi Lane subscribed to you",
     timestamp: "Today, 11:59 AM",
-    icon: <Radio className="h-4 w-4 text-neutral-900" />,
+    icon: <Radio className="h-4 w-4" />,
     accent: "bg-[#E5ECF6]",
   },
 ];
@@ -64,35 +62,40 @@ const activities: PanelItem[] = [
     id: "bug-activity",
     title: "You have a bug that needs attention",
     timestamp: "Just now",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop",
     accent: "bg-[#EEF1FF]",
   },
   {
     id: "release",
     title: "Released a new version",
     timestamp: "59 minutes ago",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop",
     accent: "bg-[#FFF4E5]",
   },
   {
     id: "bug-submitted",
     title: "Submitted a bug",
     timestamp: "12 hours ago",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
     accent: "bg-[#EEF1FF]",
   },
   {
     id: "modify",
     title: "Modified A data in Page X",
     timestamp: "Today, 11:59 AM",
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop",
     accent: "bg-[#E8F3FF]",
   },
   {
     id: "delete",
     title: "Deleted a page in Project X",
     timestamp: "Feb 2, 2023",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
     accent: "bg-[#F2EBFF]",
   },
 ];
@@ -103,42 +106,48 @@ const contacts: ContactItem[] = [
     name: "Natali Craig",
     role: "Design",
     accent: "bg-[#1C1F2E]",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop",
   },
   {
     id: "drew",
     name: "Drew Cano",
     role: "Product",
     accent: "bg-[#F25F4C]",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
   },
   {
     id: "orlando",
     name: "Orlando Diggs",
     role: "Sales",
     accent: "bg-[#FFB400]",
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop",
   },
   {
     id: "andi",
     name: "Andi Lane",
     role: "Marketing",
     accent: "bg-[#0FA3B1]",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
   },
   {
     id: "kate",
     name: "Kate Morrison",
     role: "Support",
     accent: "bg-[#3C6EEF]",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop",
   },
   {
     id: "koray",
     name: "Koray Okumus",
     role: "Engineering",
     accent: "bg-[#6C5CE7]",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
   },
 ];
 
@@ -151,14 +160,10 @@ const getInitials = (name: string) => {
     .toUpperCase();
 };
 
-
 const PanelList = ({ items }: { items: PanelItem[] }) => (
   <div className="mt-4 space-y-4">
     {items.map((item) => (
-      <div
-        key={item.id}
-        className="flex items-start gap-3 "
-      >
+      <div key={item.id} className="flex items-start gap-3 ">
         {item.image ? (
           <Image
             src={item.image}
@@ -194,10 +199,7 @@ const PanelList = ({ items }: { items: PanelItem[] }) => (
 const ContactsList = ({ items }: { items: ContactItem[] }) => (
   <div className="mt-4 space-y-3">
     {items.map((item) => (
-      <div
-        key={item.id}
-        className="flex items-center justify-between "
-      >
+      <div key={item.id} className="flex items-center justify-between ">
         <div className="flex items-center gap-4">
           {item.image ? (
             <Image
@@ -218,9 +220,13 @@ const ContactsList = ({ items }: { items: ContactItem[] }) => (
             </span>
           )}
           <div>
-            <p className="text-sm font-medium text-[#1A1F36] dark:text-white">{item.name}</p>
+            <p className="text-sm font-medium text-[#1A1F36] dark:text-white">
+              {item.name}
+            </p>
             {item.role ? (
-              <p className="text-xs text-[#8D95A5] dark:text-gray-400">{item.role}</p>
+              <p className="text-xs text-[#8D95A5] dark:text-gray-400">
+                {item.role}
+              </p>
             ) : null}
           </div>
         </div>
@@ -232,7 +238,9 @@ const ContactsList = ({ items }: { items: ContactItem[] }) => (
 const PanelContent = ({ onClose }: { onClose: () => void }) => (
   <div className="flex h-full w-full flex-col border-l border-[#E5EAF3] dark:border-[#3a3a3a] bg-white dark:bg-[#1c1c1c]">
     <div className="flex md:hidden items-center justify-between px-6 py-4 border-b border-[#E5EAF3] dark:border-[#3a3a3a]">
-      <h2 className="text-lg font-semibold text-black dark:text-white">Panel</h2>
+      <h2 className="text-lg font-semibold text-black dark:text-white">
+        Panel
+      </h2>
       <button
         onClick={onClose}
         className="text-foreground hover:opacity-80 transition"
@@ -257,17 +265,23 @@ const PanelContent = ({ onClose }: { onClose: () => void }) => (
     <div className="flex-1">
       <div className="px-6 py-6">
         <section>
-          <h3 className="text-base font-semibold text-black dark:text-white">Notifications</h3>
+          <h3 className="text-base font-semibold text-black dark:text-white">
+            Notifications
+          </h3>
           <PanelList items={notifications} />
         </section>
 
         <section className="mt-8">
-            <h3 className="text-base font-semibold text-black dark:text-white">Activities</h3>
+          <h3 className="text-base font-semibold text-black dark:text-white">
+            Activities
+          </h3>
           <PanelList items={activities} />
         </section>
 
         <section className="mt-8">
-          <h2 className="text-base font-semibold text-black dark:text-white">Contacts</h2>
+          <h2 className="text-base font-semibold text-black dark:text-white">
+            Contacts
+          </h2>
           <ContactsList items={contacts} />
         </section>
       </div>
