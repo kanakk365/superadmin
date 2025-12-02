@@ -49,9 +49,7 @@ export const NavItemComponent = ({
           isItemActive
             ? "text-sidebar-foreground"
             : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
-        } ${
-          isSidebarOpen ? "pl-1 pr-2 justify-start" : "justify-center px-0"
-        }`}
+        } ${isSidebarOpen ? "pl-1 pr-2 justify-start" : "justify-center px-0"}`}
         onClick={() => onSetActiveItemKey(itemKey)}
       >
         {isItemActive ? (
@@ -61,9 +59,7 @@ export const NavItemComponent = ({
           <item.icon className="relative z-10 text-muted-foreground" />
         ) : null}
         {isSidebarOpen ? (
-          <span className="relative z-10 whitespace-nowrap ">
-            {item.label}
-          </span>
+          <span className="relative z-10 whitespace-nowrap ">{item.label}</span>
         ) : null}
       </motion.button>
     );
@@ -96,11 +92,16 @@ export const NavItemComponent = ({
 
   const chevronMarkup = null;
 
+  // Check if this is the Destination KP item
+  const isDKP = item.label === "Destination KP";
+
   return (
     <div key={item.label} className="flex flex-col">
       <motion.button
         type="button"
-        className={`${containerBase} ${stateClasses} cursor-pointer`}
+        className={`${containerBase} ${stateClasses} cursor-pointer ${
+          item.logo || isDKP ? "justify-center" : ""
+        }`}
         onClick={handleClick}
         aria-expanded={isExpandable ? isItemExpanded : undefined}
       >
@@ -117,11 +118,23 @@ export const NavItemComponent = ({
         ) : null}
         {chevronMarkup}
         <span
-          className={`relative z-10 flex items-center justify-center rounded-md ${iconClasses} ${iconOffsetClass}`}
+          className={`relative z-10 flex items-center justify-center rounded-md ${
+            !item.logo && !isDKP ? iconClasses : ""
+          } ${iconOffsetClass}`}
         >
-          {item.icon ? <item.icon /> : null}
+          {item.logo ? (
+            <img
+              src={item.logo}
+              alt={item.label}
+              className="h-16 w-16 object-contain"
+            />
+          ) : isDKP ? (
+            <span className="text-lg font-semibold">DKP</span>
+          ) : item.icon ? (
+            <item.icon />
+          ) : null}
         </span>
-        {isSidebarOpen ? (
+        {isSidebarOpen && !item.logo && !isDKP ? (
           <span className="relative text-sm font-normal z-10 whitespace-nowrap text-left">
             {item.label}
           </span>

@@ -16,10 +16,20 @@ export const navSections: NavSection[] = [
   {
     title: "Projects",
     items: [
-      { label: "Battle Lounge", icon: IconUser, href: "/battle-lounge" },
-      { label: "GameReel", icon: IconGrid, href: "/game-reel" },
+      {
+        label: "Battle Lounge",
+        icon: IconUser,
+        logo: "/bl-logo.png",
+        href: "/battle-lounge",
+      },
+      {
+        label: "GameReel",
+        icon: IconGrid,
+        logo: "/gamereel-logo.png",
+        href: "/game-reel",
+      },
       { label: "Destination KP", icon: IconLayers, href: "/destination-kp" },
-      { label: "YSN", icon: IconPlay, href: "/ysn" },
+      { label: "YSN", icon: IconPlay, logo: "/ysn-logo.png", href: "/ysn" },
     ],
   },
 ];
