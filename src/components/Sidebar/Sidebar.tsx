@@ -19,7 +19,7 @@ const SidebarComponent = () => {
   const toggleItem = useSidebarStore((state) => state.toggleItem);
   const setActiveItemKey = useSidebarStore((state) => state.setActiveItemKey);
   const pathname = usePathname();
-  
+
   // Initialize expanded items on first mount
   useEffect(() => {
     if (Object.keys(expandedItems).length === 0) {
@@ -56,7 +56,7 @@ const SidebarComponent = () => {
       <SidebarBody className=" border-r border-border bg-sidebar h-screen max-h-screen">
         <div className="flex items-center h-16 px-5 border-b border-border">
           <h1 className="text-lg font-semibold text-sidebar-foreground">
-            {isSidebarOpen ? "ByeWind" : "BW"}
+            {isSidebarOpen ? "OnePlace" : "OP"}
           </h1>
         </div>
         <ScrollArea className=" pt-6 pr-4 h-[calc(100vh-64px)] max-h-[calc(100vh-64px)]">
