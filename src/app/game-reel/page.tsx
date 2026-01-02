@@ -3,7 +3,7 @@ import { GameReel } from "@/components/game-reel/GameReel";
 
 export default function Page() {
   return (
-    <DashboardLayout pageLabel="GameReel">
+    <DashboardLayout pageLabel="Connected Athlete">
       <GameReel />
     </DashboardLayout>
   );

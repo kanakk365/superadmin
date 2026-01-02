@@ -23,9 +23,9 @@ export const navSections: NavSection[] = [
         href: "/battle-lounge",
       },
       {
-        label: "GameReel",
+        label: "Connected Athlete",
         icon: IconGrid,
-        logo: "/gamereel-logo.png",
+        logo: "/ca.png",
         href: "/game-reel",
       },
       { label: "Destination KP", icon: IconLayers, href: "/destination-kp" },
