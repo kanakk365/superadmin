@@ -25,10 +25,15 @@ export const navSections: NavSection[] = [
       {
         label: "Connected Athlete",
         icon: IconGrid,
-        logo: "/ca.png",
+        logo: "/sidebar/connected-athelete.png",
         href: "/game-reel",
       },
-      { label: "Destination KP", icon: IconLayers, href: "/destination-kp" },
+      {
+        label: "Destination KP",
+        icon: IconLayers,
+        logo: "/sidebar/dkp_white_logo.png",
+        href: "/destination-kp",
+      },
       { label: "YSN", icon: IconPlay, logo: "/ysn-logo.png", href: "/ysn" },
     ],
   },

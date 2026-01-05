@@ -45,11 +45,10 @@ export const NavItemComponent = ({
       <motion.button
         key={item.label}
         type="button"
-        className={`relative flex items-center gap-3 rounded-full py-1 text-sm transition-colors cursor-pointer ${
-          isItemActive
+        className={`relative flex items-center gap-3 rounded-full py-1 text-sm transition-colors cursor-pointer ${isItemActive
             ? "text-sidebar-foreground"
             : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
-        } ${isSidebarOpen ? "pl-1 pr-2 justify-start" : "justify-center px-0"}`}
+          } ${isSidebarOpen ? "pl-1 pr-2 justify-start" : "justify-center px-0"}`}
         onClick={() => onSetActiveItemKey(itemKey)}
       >
         {isItemActive ? (
@@ -68,9 +67,8 @@ export const NavItemComponent = ({
   const isExpandable = Boolean(item.children?.length);
   const isItemExpanded = isExpandable ? isExpanded : false;
   const isHighlighted = isItemActive || isItemExpanded;
-  const containerBase = `relative flex items-center rounded-md py-2 text-sm font-medium transition-all ${
-    isSidebarOpen ? "gap-3 px-3" : "justify-center px-0"
-  }`;
+  const containerBase = `relative flex items-center rounded-md py-2 text-sm font-medium transition-all ${isSidebarOpen ? "gap-3 px-3" : "justify-center px-0"
+    }`;
 
   const stateClasses = isHighlighted
     ? "text-sidebar-foreground"
@@ -99,9 +97,8 @@ export const NavItemComponent = ({
     <div key={item.label} className="flex flex-col">
       <motion.button
         type="button"
-        className={`${containerBase} ${stateClasses} cursor-pointer ${
-          item.logo || isDKP ? "justify-center" : ""
-        }`}
+        className={`${containerBase} ${stateClasses} cursor-pointer ${item.logo || isDKP ? "justify-center" : ""
+          }`}
         onClick={handleClick}
         aria-expanded={isExpandable ? isItemExpanded : undefined}
       >
@@ -118,15 +115,15 @@ export const NavItemComponent = ({
         ) : null}
         {chevronMarkup}
         <span
-          className={`relative z-10 flex items-center justify-center rounded-md ${
-            !item.logo && !isDKP ? iconClasses : ""
-          } ${iconOffsetClass}`}
+          className={`relative z-10 flex items-center justify-center rounded-md ${!item.logo && !isDKP ? iconClasses : ""
+            } ${iconOffsetClass}`}
         >
           {item.logo ? (
             <img
               src={item.logo}
               alt={item.label}
-              className="h-16 w-16 object-contain"
+              className={`h-16 object-contain ${isSidebarOpen ? "w-auto max-w-[170px]" : "w-16"
+                }`}
             />
           ) : isDKP ? (
             <span className="text-lg font-semibold">DKP</span>
