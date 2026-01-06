@@ -22,11 +22,17 @@ export const navSections: NavSection[] = [
         logo: "/bl-logo.png",
         href: "/battle-lounge",
       },
+      // {
+      //   label: "Game Reel",
+      //   icon: IconGrid,
+      //   logo: "/sidebar/game-reel.png",
+      //   href: "/game-reel",
+      // },
       {
         label: "Connected Athlete",
         icon: IconGrid,
         logo: "/sidebar/connected-athelete.png",
-        href: "/game-reel",
+        href: "/connected-athlete",
       },
       {
         label: "Destination KP",
