@@ -1,10 +1,12 @@
 import DashboardLayout from "@/components/main/DashboardLayout";
-import { GameReel } from "@/components/game-reel/GameReel";
+// import { GameReel } from "@/components/game-reel/GameReel";
 
 export default function Page() {
   return (
     <DashboardLayout pageLabel="Game Reel">
-      <GameReel />
+      <div className="flex items-center justify-center h-[50vh]">
+        <h2 className="text-xl text-slate-400">Game Reel Dashboard</h2>
+      </div>
     </DashboardLayout>
   );
 }
