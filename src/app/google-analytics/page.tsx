@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import DashboardLayout from "@/components/main/DashboardLayout";
 import { GoogleConnectButton } from "@/components/dashboard/GoogleConnectButton";
 import { SocialConnectCTA } from "@/components/dashboard/SocialConnectCTA";
@@ -64,6 +64,20 @@ interface AnalyticsData {
 const TRAFFIC_COLORS = ["#10b981", "#6366f1", "#f59e0b", "#ef4444", "#8b5cf6"];
 
 export default function GoogleAnalyticsPage() {
+    return (
+        <Suspense fallback={
+            <DashboardLayout pageLabel="Google Analytics">
+                <div className="flex items-center justify-center py-20 h-full">
+                    <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+                </div>
+            </DashboardLayout>
+        }>
+            <GoogleAnalyticsContent />
+        </Suspense>
+    );
+}
+
+function GoogleAnalyticsContent() {
     const searchParams = useSearchParams();
     const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
     const [isLoading, setIsLoading] = useState(true);

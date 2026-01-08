@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import DashboardLayout from "@/components/main/DashboardLayout";
 import { GoogleConnectButton } from "@/components/dashboard/GoogleConnectButton";
 import { SocialConnectCTA } from "@/components/dashboard/SocialConnectCTA";
@@ -69,6 +69,20 @@ interface YouTubeData {
 }
 
 export default function YouTubeDataPage() {
+    return (
+        <Suspense fallback={
+            <DashboardLayout pageLabel="YouTube Data">
+                <div className="flex items-center justify-center py-20 h-full">
+                    <Loader2 className="w-8 h-8 animate-spin text-red-500" />
+                </div>
+            </DashboardLayout>
+        }>
+            <YouTubeDataContent />
+        </Suspense>
+    );
+}
+
+function YouTubeDataContent() {
     const searchParams = useSearchParams();
     const [youtubeData, setYoutubeData] = useState<YouTubeData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
