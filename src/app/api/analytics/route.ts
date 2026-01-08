@@ -52,7 +52,7 @@ async function getValidAccessToken(): Promise<string | null> {
   return accessToken || null;
 }
 
-export async function GET(): Promise<NextResponse<AnalyticsResponse>> {
+export async function GET(request: Request): Promise<NextResponse<AnalyticsResponse>> {
   try {
     const accessToken = await getValidAccessToken();
 
@@ -62,6 +62,9 @@ export async function GET(): Promise<NextResponse<AnalyticsResponse>> {
         error: "Not connected to Google Analytics",
       });
     }
+
+    const { searchParams } = new URL(request.url);
+    const requestedPropertyId = searchParams.get("propertyId");
 
     // First, get the list of GA4 properties
     const accountsResponse = await fetchWithTimeout(
@@ -85,18 +88,34 @@ export async function GET(): Promise<NextResponse<AnalyticsResponse>> {
 
     const accountsData = await accountsResponse.json();
 
-    // Get the first property (you might want to let users select)
-    const property = accountsData.accountSummaries?.[0]?.propertySummaries?.[0];
+    // Transform accounts data for the frontend
+    const availableAccounts = accountsData.accountSummaries?.map((account: any) => ({
+      id: account.account.replace("accounts/", ""),
+      name: account.displayName,
+      properties: account.propertySummaries?.map((prop: any) => ({
+        id: prop.property.replace("properties/", ""),
+        name: prop.displayName,
+      })) || [],
+    })).filter((acc: any) => acc.properties.length > 0) || [];
 
-    if (!property) {
-      return NextResponse.json({
-        connected: true,
-        error:
-          "No Google Analytics properties found. Please set up a GA4 property first.",
-      });
+    // Determine which property to use
+    let propertyId = requestedPropertyId;
+    let selectedFromName = "";
+
+    if (!propertyId) {
+        // Auto-select first available
+        if (availableAccounts.length > 0 && availableAccounts[0].properties.length > 0) {
+            propertyId = availableAccounts[0].properties[0].id;
+        }
     }
 
-    const propertyId = property.property.replace("properties/", "");
+    if (!propertyId) {
+      return NextResponse.json({
+        connected: true,
+        accounts: availableAccounts,
+        error: "No Google Analytics properties found. Please set up a GA4 property first.",
+      });
+    }
 
     // Fetch analytics data
     const reportResponse = await fetchWithTimeout(

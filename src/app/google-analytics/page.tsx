@@ -33,7 +33,13 @@ import { useSearchParams } from "next/navigation";
 
 interface AnalyticsData {
     connected: boolean;
+    accounts?: Array<{
+        id: string;
+        name: string;
+        properties: Array<{ id: string; name: string }>;
+    }>;
     data?: {
+        // ... existing data structure ...
         overview: {
             totalUsers: number;
             activeUsers: number;
@@ -82,6 +88,7 @@ function GoogleAnalyticsContent() {
     const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [connectionMessage, setConnectionMessage] = useState<string | null>(null);
+    const [selectedPropertyId, setSelectedPropertyId] = useState<string>("");
 
     useEffect(() => {
         // Check for connection status from URL params
@@ -96,17 +103,39 @@ function GoogleAnalyticsContent() {
         fetchAnalyticsData();
     }, [searchParams]);
 
-    const fetchAnalyticsData = async () => {
+    const fetchAnalyticsData = async (propertyId?: string) => {
         setIsLoading(true);
         try {
-            const response = await fetch("/api/analytics");
+            const url = propertyId
+                ? `/api/analytics?propertyId=${propertyId}`
+                : "/api/analytics";
+
+            const response = await fetch(url);
             const data = await response.json();
             setAnalyticsData(data);
+
+            if (propertyId) {
+                setSelectedPropertyId(propertyId);
+            } else if (data.accounts?.length > 0 && !selectedPropertyId) {
+                // Set initial property ID if not set
+                const firstAccount = data.accounts.find((acc: any) => acc.properties.length > 0);
+                if (firstAccount && firstAccount.properties.length > 0) {
+                    setSelectedPropertyId(firstAccount.properties[0].id);
+                }
+            }
         } catch (error) {
             console.error("Failed to fetch analytics:", error);
             setAnalyticsData({ connected: false, error: "Failed to fetch data" });
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleAccountChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const newPropertyId = e.target.value;
+        if (newPropertyId) {
+            setSelectedPropertyId(newPropertyId);
+            fetchAnalyticsData(newPropertyId);
         }
     };
 
@@ -149,13 +178,39 @@ function GoogleAnalyticsContent() {
 
                     {/* Header with Connect Button */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div>
-                            <h1 className="text-2xl font-bold text-foreground">
-                                Google Analytics
-                            </h1>
-                            <p className="text-muted-foreground">
-                                View your website traffic and user analytics
-                            </p>
+                        <div className="flex flex-col gap-2">
+                            <div>
+                                <h1 className="text-2xl font-bold text-foreground">
+                                    Google Analytics
+                                </h1>
+                                <p className="text-muted-foreground">
+                                    View your website traffic and user analytics
+                                </p>
+                            </div>
+
+                            {/* Account Selector */}
+                            {!isLoading && analyticsData?.accounts && analyticsData.accounts.length > 0 && (
+                                <div className="relative mt-2">
+                                    <select
+                                        value={selectedPropertyId}
+                                        onChange={handleAccountChange}
+                                        className="w-full md:w-[300px] p-2.5 pl-3 pr-10 rounded-xl bg-card border border-border text-foreground font-medium outline-none focus:ring-2 focus:ring-purple-500/20 appearance-none cursor-pointer hover:border-purple-500/50 transition-colors"
+                                    >
+                                        {analyticsData.accounts.map((account) => (
+                                            <optgroup key={account.id} label={account.name}>
+                                                {account.properties.map((prop) => (
+                                                    <option key={prop.id} value={prop.id}>
+                                                        {prop.name}
+                                                    </option>
+                                                ))}
+                                            </optgroup>
+                                        ))}
+                                    </select>
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
+                                        <MousePointerClick className="w-4 h-4" />
+                                    </div>
+                                </div>
+                            )}
                         </div>
                         <GoogleConnectButton />
                     </div>
@@ -185,7 +240,7 @@ function GoogleAnalyticsContent() {
                                 {analyticsData.error}
                             </p>
                             <button
-                                onClick={fetchAnalyticsData}
+                                onClick={() => fetchAnalyticsData()}
                                 className="px-4 py-2 bg-purple-500 text-white rounded-xl hover:bg-purple-600 transition-colors"
                             >
                                 Retry
