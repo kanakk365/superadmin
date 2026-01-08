@@ -61,7 +61,7 @@ interface AnalyticsData {
     error?: string;
 }
 
-const TRAFFIC_COLORS = ["#10b981", "#6366f1", "#f59e0b", "#ef4444", "#8b5cf6"];
+const TRAFFIC_COLORS = ["#a855f7", "#6366f1", "#d946ef", "#8b5cf6", "#c084fc"];
 
 export default function GoogleAnalyticsPage() {
     return (
@@ -208,7 +208,7 @@ function GoogleAnalyticsContent() {
                                     value={formatNumber(analyticsData.data.overview.activeUsers)}
                                     label="Active Users"
                                     icon={<MousePointerClick className="w-5 h-5" />}
-                                    color="emerald"
+                                    color="indigo"
                                 />
                                 <StatCard
                                     value={formatDuration(
@@ -216,7 +216,7 @@ function GoogleAnalyticsContent() {
                                     )}
                                     label="Avg. Session"
                                     icon={<Clock className="w-5 h-5" />}
-                                    color="blue"
+                                    color="rose"
                                 />
                                 <StatCard
                                     value={`${analyticsData.data.overview.bounceRate.toFixed(1)}%`}
@@ -229,8 +229,8 @@ function GoogleAnalyticsContent() {
                             {/* Charts Row */}
                             <div className="grid lg:grid-cols-3 gap-5 lg:gap-7.5">
                                 {/* Traffic Over Time */}
-                                <div className="lg:col-span-2 group rounded-[32px] bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-600 text-white p-8 lg:p-10 shadow-xl shadow-emerald-500/10 relative overflow-hidden">
-                                    <div className="flex flex-col gap-6 relative z-10">
+                                <div className="lg:col-span-2 group rounded-[32px] bg-gradient-to-br from-violet-500 via-purple-600 to-indigo-600 text-white p-8 lg:p-10 shadow-xl shadow-purple-500/10 relative overflow-hidden flex flex-col">
+                                    <div className="flex flex-col gap-6 relative z-10 h-full">
                                         <div className="flex items-start justify-between">
                                             <div className="flex items-center gap-4">
                                                 <div className="p-3 bg-white/15 rounded-2xl backdrop-blur-md">
@@ -253,7 +253,7 @@ function GoogleAnalyticsContent() {
                                             />
                                         </div>
 
-                                        <div className="h-[200px] w-full -ml-2">
+                                        <div className="flex-1 w-full -ml-2 min-h-[200px]">
                                             <ResponsiveContainer width="100%" height="100%">
                                                 <AreaChart data={analyticsData.data.dailyData}>
                                                     <defs>
@@ -293,7 +293,7 @@ function GoogleAnalyticsContent() {
                                                             backgroundColor: "rgba(255, 255, 255, 0.95)",
                                                             borderRadius: "16px",
                                                             border: "none",
-                                                            color: "#10b981",
+                                                            color: "#8b5cf6",
                                                             boxShadow: "0 10px 30px -10px rgba(0,0,0,0.2)",
                                                         }}
                                                     />
@@ -462,12 +462,12 @@ const StatCard = ({
     value: string;
     label: string;
     icon: React.ReactNode;
-    color?: "purple" | "emerald" | "blue" | "amber";
+    color?: "purple" | "indigo" | "rose" | "amber";
 }) => {
     const colorClasses = {
         purple: "bg-purple-500/10 text-purple-500",
-        emerald: "bg-emerald-500/10 text-emerald-500",
-        blue: "bg-blue-500/10 text-blue-500",
+        indigo: "bg-indigo-500/10 text-indigo-500",
+        rose: "bg-rose-500/10 text-rose-500",
         amber: "bg-amber-500/10 text-amber-500",
     };
 

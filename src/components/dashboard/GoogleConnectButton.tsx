@@ -48,36 +48,17 @@ export function GoogleConnectButton({
 
     if (isConnected && user) {
         return (
-            <div
+            <button
+                onClick={handleDisconnect}
                 className={cn(
-                    "flex items-center gap-4",
-                    variant === "compact" && "gap-2",
+                    "flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-sm transition-all",
+                    "bg-rose-500/10 text-rose-600 hover:bg-rose-500/20 dark:text-rose-400",
                     className
                 )}
             >
-                <div className="flex items-center gap-3 px-4 py-2 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
-                    {user.picture && (
-                        <img
-                            src={user.picture}
-                            alt={user.name}
-                            className="w-8 h-8 rounded-full"
-                        />
-                    )}
-                    <div className="flex flex-col">
-                        <span className="text-sm font-medium text-foreground">
-                            {user.name}
-                        </span>
-                        <span className="text-xs text-muted-foreground">{user.email}</span>
-                    </div>
-                </div>
-                <button
-                    onClick={handleDisconnect}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-sm transition-all bg-rose-500/10 text-rose-600 hover:bg-rose-500/20 dark:text-rose-400"
-                >
-                    <LogOut className="w-4 h-4" />
-                    <span>Disconnect</span>
-                </button>
-            </div>
+                <LogOut className="w-4 h-4" />
+                <span>Disconnect</span>
+            </button>
         );
     }
 

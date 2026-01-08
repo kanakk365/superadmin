@@ -73,7 +73,7 @@ export default function YouTubeDataPage() {
         <Suspense fallback={
             <DashboardLayout pageLabel="YouTube Data">
                 <div className="flex items-center justify-center py-20 h-full">
-                    <Loader2 className="w-8 h-8 animate-spin text-red-500" />
+                    <Loader2 className="w-8 h-8 animate-spin text-fuchsia-500" />
                 </div>
             </DashboardLayout>
         }>
@@ -160,13 +160,27 @@ function YouTubeDataContent() {
 
                     {/* Header with Connect Button */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div>
-                            <h1 className="text-2xl font-bold text-foreground">
-                                YouTube Analytics
-                            </h1>
-                            <p className="text-muted-foreground">
-                                View your channel performance and video analytics
-                            </p>
+                        <div className="flex items-center gap-4">
+                            {/* Show channel thumbnail when connected */}
+                            {!isLoading && youtubeData?.connected && youtubeData?.data?.channel.thumbnail && (
+                                <img
+                                    src={youtubeData.data.channel.thumbnail}
+                                    alt={youtubeData.data.channel.title}
+                                    className="w-14 h-14 rounded-full border-2 border-fuchsia-500/20"
+                                />
+                            )}
+                            <div>
+                                <h1 className="text-2xl font-bold text-foreground">
+                                    {!isLoading && youtubeData?.connected && youtubeData?.data
+                                        ? youtubeData.data.channel.title
+                                        : "YouTube Analytics"}
+                                </h1>
+                                <p className="text-muted-foreground">
+                                    {!isLoading && youtubeData?.connected && youtubeData?.data
+                                        ? "View your channel performance and video analytics"
+                                        : "Connect your YouTube account to view analytics"}
+                                </p>
+                            </div>
                         </div>
                         <GoogleConnectButton />
                     </div>
@@ -174,7 +188,7 @@ function YouTubeDataContent() {
                     {/* Loading State */}
                     {isLoading && (
                         <div className="flex items-center justify-center py-20">
-                            <Loader2 className="w-8 h-8 animate-spin text-red-500" />
+                            <Loader2 className="w-8 h-8 animate-spin text-fuchsia-500" />
                         </div>
                     )}
 
@@ -197,7 +211,7 @@ function YouTubeDataContent() {
                             </p>
                             <button
                                 onClick={fetchYouTubeData}
-                                className="px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors"
+                                className="px-4 py-2 bg-fuchsia-500 text-white rounded-xl hover:bg-fuchsia-600 transition-colors"
                             >
                                 Retry
                             </button>
@@ -207,35 +221,13 @@ function YouTubeDataContent() {
                     {/* Connected with Data */}
                     {!isLoading && youtubeData?.connected && youtubeData?.data && (
                         <>
-                            {/* Channel Info Card */}
-                            <div className="rounded-[32px] bg-gradient-to-br from-red-500 via-red-600 to-rose-600 text-white p-6 lg:p-8 shadow-xl shadow-red-500/10 relative overflow-hidden">
-                                <div className="flex items-center gap-6 relative z-10">
-                                    {youtubeData.data.channel.thumbnail && (
-                                        <img
-                                            src={youtubeData.data.channel.thumbnail}
-                                            alt={youtubeData.data.channel.title}
-                                            className="w-20 h-20 rounded-full border-4 border-white/20"
-                                        />
-                                    )}
-                                    <div className="flex-1">
-                                        <h2 className="text-2xl lg:text-3xl font-bold">
-                                            {youtubeData.data.channel.title}
-                                        </h2>
-                                        <p className="text-white/70 text-sm mt-1 line-clamp-2">
-                                            {youtubeData.data.channel.description}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="absolute -right-20 -top-20 w-80 h-80 bg-white/10 rounded-full blur-[80px] pointer-events-none" />
-                            </div>
-
                             {/* Overview Stats */}
                             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
                                 <StatCard
                                     value={formatNumber(youtubeData.data.channel.subscriberCount)}
                                     label="Subscribers"
                                     icon={<Users className="w-5 h-5" />}
-                                    color="red"
+                                    color="fuchsia"
                                     change={`+${youtubeData.data.analytics.subscribersGained - youtubeData.data.analytics.subscribersLost}`}
                                 />
                                 <StatCard
@@ -248,13 +240,13 @@ function YouTubeDataContent() {
                                     value={youtubeData.data.channel.videoCount.toString()}
                                     label="Videos"
                                     icon={<Video className="w-5 h-5" />}
-                                    color="blue"
+                                    color="indigo"
                                 />
                                 <StatCard
                                     value={formatWatchTime(youtubeData.data.analytics.watchTimeMinutes)}
                                     label="Watch Time (30d)"
                                     icon={<Clock className="w-5 h-5" />}
-                                    color="emerald"
+                                    color="amber"
                                 />
                             </div>
 
@@ -263,7 +255,7 @@ function YouTubeDataContent() {
                                 {/* Views Over Time */}
                                 <div className="rounded-[32px] bg-card border border-border p-6 lg:p-8 shadow-sm hover:shadow-lg transition-all">
                                     <div className="flex items-center gap-3 mb-6">
-                                        <div className="p-2.5 bg-red-500/10 rounded-xl text-red-500">
+                                        <div className="p-2.5 bg-fuchsia-500/10 rounded-xl text-fuchsia-500">
                                             <TrendingUp className="w-5 h-5" />
                                         </div>
                                         <h3 className="text-lg font-bold text-foreground">
@@ -284,12 +276,12 @@ function YouTubeDataContent() {
                                                     >
                                                         <stop
                                                             offset="5%"
-                                                            stopColor="#ef4444"
+                                                            stopColor="#d946ef"
                                                             stopOpacity={0.3}
                                                         />
                                                         <stop
                                                             offset="95%"
-                                                            stopColor="#ef4444"
+                                                            stopColor="#d946ef"
                                                             stopOpacity={0}
                                                         />
                                                     </linearGradient>
@@ -320,7 +312,7 @@ function YouTubeDataContent() {
                                                 <Area
                                                     type="monotone"
                                                     dataKey="views"
-                                                    stroke="#ef4444"
+                                                    stroke="#d946ef"
                                                     strokeWidth={2}
                                                     fillOpacity={1}
                                                     fill="url(#colorViews)"
@@ -381,7 +373,7 @@ function YouTubeDataContent() {
                             {/* Recent Videos */}
                             <div className="rounded-[32px] bg-card border border-border p-6 lg:p-8 shadow-sm">
                                 <div className="flex items-center gap-3 mb-6">
-                                    <div className="p-2.5 bg-red-500/10 rounded-xl text-red-500">
+                                    <div className="p-2.5 bg-fuchsia-500/10 rounded-xl text-fuchsia-500">
                                         <PlayCircle className="w-5 h-5" />
                                     </div>
                                     <h3 className="text-lg font-bold text-foreground">
@@ -412,7 +404,7 @@ function YouTubeDataContent() {
                                                 )}
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <h4 className="font-semibold text-foreground line-clamp-2 group-hover:text-red-500 transition-colors">
+                                                <h4 className="font-semibold text-foreground line-clamp-2 group-hover:text-fuchsia-500 transition-colors">
                                                     {video.title}
                                                 </h4>
                                                 <p className="text-sm text-muted-foreground mt-1">
@@ -457,20 +449,20 @@ const StatCard = ({
     value,
     label,
     icon,
-    color = "red",
+    color = "fuchsia",
     change,
 }: {
     value: string;
     label: string;
     icon: React.ReactNode;
-    color?: "red" | "purple" | "blue" | "emerald";
+    color?: "fuchsia" | "purple" | "indigo" | "amber";
     change?: string;
 }) => {
     const colorClasses = {
-        red: "bg-red-500/10 text-red-500",
+        fuchsia: "bg-fuchsia-500/10 text-fuchsia-500",
         purple: "bg-purple-500/10 text-purple-500",
-        blue: "bg-blue-500/10 text-blue-500",
-        emerald: "bg-emerald-500/10 text-emerald-500",
+        indigo: "bg-indigo-500/10 text-indigo-500",
+        amber: "bg-amber-500/10 text-amber-500",
     };
 
     return (
@@ -478,7 +470,7 @@ const StatCard = ({
             <div className="flex justify-between items-start">
                 <div className={cn("p-2.5 rounded-xl", colorClasses[color])}>{icon}</div>
                 {change && (
-                    <span className="text-xs font-bold px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                    <span className="text-xs font-bold px-2 py-1 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400">
                         {change}
                     </span>
                 )}
