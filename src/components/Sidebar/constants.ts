@@ -44,11 +44,13 @@ export const navSections: NavSection[] = [
       {
         label: "Google Analytics",
         icon: IconGrid,
+        logo: "/analytics.svg",
         href: "/google-analytics",
       },
       {
         label: "YouTube Data",
         icon: IconPlay,
+        logo: "/youtube.svg",
         href: "/youtube-data",
       },
     ],
