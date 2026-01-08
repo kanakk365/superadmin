@@ -35,6 +35,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 // --- Mock Data ---
 
@@ -77,8 +78,8 @@ const demographicsConfig = {
 export default function ConnectedAthletePage() {
   return (
     <DashboardLayout pageLabel="Connected Athlete">
-      <div className="h-full overflow-y-auto p-4 md:p-6 lg:p-8 scrollbar-hide">
-        <div className="grid gap-5 lg:gap-7.5 animate-in fade-in duration-500 pb-10">
+      <ScrollArea className="h-full w-full">
+        <div className="flex flex-col gap-5 lg:gap-7.5 p-4 md:p-6 lg:p-8 animate-in fade-in duration-500">
           {/* Row 1: Bento Grid */}
           <div className="grid lg:grid-cols-3 gap-y-5 lg:gap-7.5 items-stretch">
             {/* Col 1: Small Stats Grid */}
@@ -365,7 +366,8 @@ export default function ConnectedAthletePage() {
             </div>
           </div>
         </div>
-      </div>
+        <ScrollBar />
+      </ScrollArea>
     </DashboardLayout>
   );
 }

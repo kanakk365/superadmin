@@ -41,6 +41,16 @@ export const navSections: NavSection[] = [
         href: "/destination-kp",
       },
       { label: "YSN", icon: IconPlay, logo: "/ysn-logo.png", href: "/ysn" },
+      {
+        label: "Google Analytics",
+        icon: IconGrid,
+        href: "/google-analytics",
+      },
+      {
+        label: "YouTube Data",
+        icon: IconPlay,
+        href: "/youtube-data",
+      },
     ],
   },
 ];
