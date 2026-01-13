@@ -77,7 +77,7 @@ const demographicsConfig = {
 
 export default function ConnectedAthletePage() {
   return (
-    <DashboardLayout pageLabel="Connected Athlete">
+    <DashboardLayout pageLabel="Rivalis">
       <ScrollArea className="h-full w-full">
         <div className="flex flex-col gap-5 lg:gap-7.5 p-4 md:p-6 lg:p-8 animate-in fade-in duration-500">
           {/* Row 1: Bento Grid */}
@@ -417,8 +417,8 @@ const StatCard = ({
           highlight
             ? "bg-white/20 text-white"
             : tone === "positive"
-            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-            : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
+              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+              : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
         )}
       >
         {change}

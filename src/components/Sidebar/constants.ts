@@ -29,9 +29,9 @@ export const navSections: NavSection[] = [
       //   href: "/game-reel",
       // },
       {
-        label: "Connected Athlete",
+        label: "Rivalis",
         icon: IconGrid,
-        logo: "/sidebar/connected-athelete.png",
+        logo: "/rivalis.png",
         href: "/connected-athlete",
       },
       {
