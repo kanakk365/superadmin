@@ -17,6 +17,13 @@ export const navSections: NavSection[] = [
     title: "Projects",
     items: [
       {
+        label: "Destination KP",
+        icon: IconLayers,
+        logo: "/sidebar/dkp_white_logo.png",
+        href: "/destination-kp",
+      },
+      { label: "YSN", icon: IconPlay, logo: "/ysn-logo.png", href: "/ysn" },
+      {
         label: "Battle Lounge",
         icon: IconUser,
         logo: "/bl-logo.png",
@@ -34,13 +41,6 @@ export const navSections: NavSection[] = [
         logo: "/rivalis.png",
         href: "/connected-athlete",
       },
-      {
-        label: "Destination KP",
-        icon: IconLayers,
-        logo: "/sidebar/dkp_white_logo.png",
-        href: "/destination-kp",
-      },
-      { label: "YSN", icon: IconPlay, logo: "/ysn-logo.png", href: "/ysn" },
       {
         label: "Google Analytics",
         icon: IconGrid,
