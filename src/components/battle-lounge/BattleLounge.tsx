@@ -3,6 +3,10 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { TournamentList } from "./TournamentList";
 import { BattleLoungeReachChart } from "./BattleLoungeReachChart";
 import { PopularGamesPie } from "./PopularGamesPie";
+import { NewUsersChart } from "./NewUsersChart";
+import { TournamentsStatsChart } from "./TournamentsStatsChart";
+import { LiveTournaments } from "./LiveTournaments";
+import { AdvertiserStats } from "./AdvertiserStats";
 
 export const BattleLounge = () => {
   return (
@@ -30,11 +34,23 @@ export const BattleLounge = () => {
           </div>
         </div>
 
+        {/* New Users Chart - Day/Week/Month/Year */}
+        <div className="grid lg:grid-cols-2 gap-6 lg:gap-8">
+          <NewUsersChart />
+          <TournamentsStatsChart />
+        </div>
+
+        {/* Live Tournaments Section */}
+        <LiveTournaments />
+
         {/* Tournament List and Popular Games */}
         <div className="grid gap-6 lg:gap-8 lg:grid-cols-[2fr_1fr]">
           <TournamentList />
           <PopularGamesPie />
         </div>
+
+        {/* Advertiser Stats Section */}
+        <AdvertiserStats />
       </div>
       <ScrollBar />
     </ScrollArea>
