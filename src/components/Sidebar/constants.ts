@@ -14,6 +14,16 @@ import type { NavSection } from "./types";
 
 export const navSections: NavSection[] = [
   {
+    title: "Dashboard",
+    items: [
+      {
+        label: "Overview",
+        icon: IconGrid,
+        href: "/overall",
+      },
+    ],
+  },
+  {
     title: "Projects",
     items: [
       {
