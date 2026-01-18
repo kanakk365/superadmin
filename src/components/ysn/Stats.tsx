@@ -2,33 +2,76 @@
 
 import { TrendBadge } from "../dashboard/TrendBadge";
 import { cn } from "@/lib/utils";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { Area, AreaChart, ResponsiveContainer, Tooltip } from "recharts";
 import {
   Users,
   Trophy,
   DollarSign,
-  Target,
-  Calendar,
-  TrendingUp,
+  Activity,
+  UserPlus,
+  Shield,
 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-const revenueData = [
-  { name: "Jan", value: 3200 },
-  { name: "Feb", value: 2800 },
-  { name: "Mar", value: 4100 },
-  { name: "Apr", value: 3500 },
-  { name: "May", value: 2900 },
-  { name: "Jun", value: 3800 },
-  { name: "Jul", value: 4200 },
-  { name: "Aug", value: 5100 },
-  { name: "Sep", value: 6200 },
-  { name: "Oct", value: 7500 },
-  { name: "Nov", value: 8100 },
-  { name: "Dec", value: 9200 },
-];
+// Mock Data for different time ranges
+const revenueDataMap = {
+  day: [
+    { name: "00:00", value: 120 },
+    { name: "04:00", value: 150 },
+    { name: "08:00", value: 450 },
+    { name: "12:00", value: 890 },
+    { name: "16:00", value: 720 },
+    { name: "20:00", value: 950 },
+    { name: "23:59", value: 400 },
+  ],
+  week: [
+    { name: "Mon", value: 3200 },
+    { name: "Tue", value: 4500 },
+    { name: "Wed", value: 3800 },
+    { name: "Thu", value: 5200 },
+    { name: "Fri", value: 6100 },
+    { name: "Sat", value: 7500 },
+    { name: "Sun", value: 6800 },
+  ],
+  month: [
+    { name: "Week 1", value: 12500 },
+    { name: "Week 2", value: 15800 },
+    { name: "Week 3", value: 14200 },
+    { name: "Week 4", value: 18500 },
+  ],
+  year: [
+    { name: "Jan", value: 32000 },
+    { name: "Feb", value: 28000 },
+    { name: "Mar", value: 41000 },
+    { name: "Apr", value: 35000 },
+    { name: "May", value: 29000 },
+    { name: "Jun", value: 38000 },
+    { name: "Jul", value: 42000 },
+    { name: "Aug", value: 51000 },
+    { name: "Sep", value: 62000 },
+    { name: "Oct", value: 75000 },
+    { name: "Nov", value: 81000 },
+    { name: "Dec", value: 92000 },
+  ],
+};
+
+const totalsMap = {
+  day: "$3,680",
+  week: "$37.1K",
+  month: "$45.2K",
+  year: "$614K",
+};
 
 export const YSNStats = () => {
+  const [timeRange, setTimeRange] = useState<"day" | "week" | "month" | "year">("month");
+
   return (
     <div className="grid gap-5 lg:gap-7.5">
       {/* First Row - Bento Grid: 2x2 Stats + Large Revenue Card */}
@@ -37,33 +80,33 @@ export const YSNStats = () => {
         <div className="lg:col-span-1">
           <div className="grid grid-cols-2 gap-4 lg:gap-6 h-full items-stretch">
             <StatCard
-              value="156"
-              label="Coaches"
+              value="34.5K"
+              label="Total Users"
               icon={<Users className="w-5 h-5" />}
               change="+12%"
               delay={0}
             />
             <StatCard
-              value="890"
-              label="Players"
-              icon={<Target className="w-5 h-5" />}
+              value="12.2K"
+              label="Active Users"
+              icon={<Activity className="w-5 h-5" />}
               change="+24%"
               highlight
               delay={100}
             />
             <StatCard
-              value="24"
-              label="Organizations"
-              icon={<Trophy className="w-5 h-5" />}
-              change="+2"
+              value="1,450"
+              label="New Users"
+              icon={<UserPlus className="w-5 h-5" />}
+              change="+15%"
               delay={200}
               highlight
             />
             <StatCard
-              value="12"
-              label="Upcoming"
-              icon={<Calendar className="w-5 h-5" />}
-              change="Next 7d"
+              value="284"
+              label="Active Teams"
+              icon={<Shield className="w-5 h-5" />}
+              change="+8"
               delay={300}
             />
           </div>
@@ -83,24 +126,39 @@ export const YSNStats = () => {
                       Total Revenue
                     </p>
                     <h3 className="text-4xl lg:text-5xl font-bold tracking-tight mt-1 text-white">
-                      $45.2K
+                      {totalsMap[timeRange]}
                     </h3>
                   </div>
                 </div>
-                <div className="flex flex-col items-end gap-1">
-                  <TrendBadge
-                    change="+8%"
-                    tone="positive"
-                    className=" text-white border-white/10 backdrop-blur-md px-3 py-1"
-                  />
-                  <p className="text-xs">vs last month</p>
+                <div className="flex items-center gap-3">
+                  <Select
+                    value={timeRange}
+                    onValueChange={(val: any) => setTimeRange(val)}
+                  >
+                    <SelectTrigger className="w-[100px] h-8 bg-white/10 border-white/10 text-white rounded-lg backdrop-blur-md focus:ring-0 focus:ring-offset-0">
+                      <SelectValue placeholder="Period" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="day">Day</SelectItem>
+                      <SelectItem value="week">Week</SelectItem>
+                      <SelectItem value="month">Month</SelectItem>
+                      <SelectItem value="year">Year</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <div className="flex flex-col items-end gap-1">
+                    <TrendBadge
+                      change="+8%"
+                      tone="positive"
+                      className=" text-white border-white/10 backdrop-blur-md px-3 py-1"
+                    />
+                  </div>
                 </div>
               </div>
 
               {/* Revenue Chart */}
               <div className="flex-1 w-full min-h-[140px] -ml-2 relative">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={revenueData}>
+                  <AreaChart data={revenueDataMap[timeRange]}>
                     <defs>
                       <linearGradient
                         id="colorRevenueYSN"
@@ -143,21 +201,21 @@ export const YSNStats = () => {
               <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/10">
                 <div className="flex flex-col gap-1">
                   <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">
-                    Matches
+                    Team Alpha
                   </span>
-                  <span className="text-xl font-bold text-white">1,240</span>
+                  <span className="text-xl font-bold text-white">45%</span>
                 </div>
                 <div className="flex flex-col gap-1 border-l border-white/10 pl-6">
                   <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">
-                    Registrations
+                    Team Beta
                   </span>
-                  <span className="text-xl font-bold text-white">$28.5K</span>
+                  <span className="text-xl font-bold text-white">32%</span>
                 </div>
                 <div className="flex flex-col gap-1 border-l border-white/10 pl-6">
                   <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">
-                    Merchandise
+                    Team Gamma
                   </span>
-                  <span className="text-xl font-bold text-white">$16.7K</span>
+                  <span className="text-xl font-bold text-white">23%</span>
                 </div>
               </div>
             </div>
@@ -213,8 +271,8 @@ const StatCard = ({
           highlight
             ? "bg-white/20 text-white"
             : tone === "positive"
-            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-            : "bg-red-500/10 text-red-600 dark:text-red-400"
+              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+              : "bg-red-500/10 text-red-600 dark:text-red-400"
         )}
       >
         {change}

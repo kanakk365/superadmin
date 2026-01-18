@@ -1,24 +1,22 @@
 import { YSNStats } from "./Stats";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { YSNRevenueChart } from "./RevenueChart";
 import { MatchesTable } from "./MatchesTable";
-import { UserCoachAgeChart } from "./UserCoachAgeChart";
 import { MatchesChart } from "./MatchesChart";
+import { NewUsersChart } from "./NewUsersChart";
 
 export const YSN = () => {
   return (
     <ScrollArea className="h-full w-full">
-      <div className="flex flex-col gap-8 px-3 sm:px-8 py-8">
+      <div className="flex flex-col gap-8 px-4 sm:px-8 py-8 max-w-[1600px] mx-auto">
         <YSNStats />
 
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-          <YSNRevenueChart />
-          <UserCoachAgeChart />
+        <div className="grid gap-6 lg:grid-cols-2">
+          <NewUsersChart />
+          <MatchesChart />
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <div className="grid gap-6">
           <MatchesTable />
-          <MatchesChart />
         </div>
       </div>
       <ScrollBar />
