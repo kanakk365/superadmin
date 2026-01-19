@@ -14,18 +14,12 @@ import type { NavSection } from "./types";
 
 export const navSections: NavSection[] = [
   {
-    title: "Dashboard",
+    title: "",
     items: [
       {
-        label: "Overview",
-        icon: IconGrid,
+        label: "Dashboard",
         href: "/overall",
       },
-    ],
-  },
-  {
-    title: "Projects",
-    items: [
       {
         label: "Destination KP",
         icon: IconLayers,
@@ -79,7 +73,5 @@ export const getInitialActiveItemKey = (pathname: string) => {
       }
     }
   }
-  const firstSection = navSections[0];
-  const firstItem = firstSection?.items[0];
-  return firstItem ? `${firstSection.title}-${firstItem.label}` : "";
+  return "";
 };

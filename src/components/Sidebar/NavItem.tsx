@@ -35,6 +35,10 @@ export const NavItemComponent = ({
   const isDefaultItem = item.label === "Default";
   const isOrdersItem = item.label === "Orders";
   const itemKey = `${sectionTitle}-${item.label}`;
+  // Check special items
+  const isDKP = item.label === "Destination KP";
+  const isDashboard = item.label === "Dashboard";
+
   const isRouteItem = Boolean(item.href);
   const isItemActive = isRouteItem
     ? item.href === pathname
@@ -46,8 +50,8 @@ export const NavItemComponent = ({
         key={item.label}
         type="button"
         className={`relative flex items-center gap-3 rounded-full py-1 text-sm transition-colors cursor-pointer ${isItemActive
-            ? "text-sidebar-foreground"
-            : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
+          ? "text-sidebar-foreground"
+          : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
           } ${isSidebarOpen ? "pl-1 pr-2 justify-start" : "justify-center px-0"}`}
         onClick={() => onSetActiveItemKey(itemKey)}
       >
@@ -67,7 +71,7 @@ export const NavItemComponent = ({
   const isExpandable = Boolean(item.children?.length);
   const isItemExpanded = isExpandable ? isExpanded : false;
   const isHighlighted = isItemActive || isItemExpanded;
-  const containerBase = `relative flex items-center rounded-md py-2 text-sm font-medium transition-all ${isSidebarOpen ? "gap-3 px-3" : "justify-center px-0"
+  const containerBase = `relative flex items-center rounded-md ${isDashboard ? "py-6" : "py-2"} text-sm font-medium transition-all ${isSidebarOpen ? "gap-3 px-3" : "justify-center px-0"
     }`;
 
   const stateClasses = isHighlighted
@@ -90,14 +94,11 @@ export const NavItemComponent = ({
 
   const chevronMarkup = null;
 
-  // Check if this is the Destination KP item
-  const isDKP = item.label === "Destination KP";
-
   return (
     <div key={item.label} className="flex flex-col">
       <motion.button
         type="button"
-        className={`${containerBase} ${stateClasses} cursor-pointer ${item.logo || isDKP ? "justify-center" : ""
+        className={`${containerBase} ${stateClasses} cursor-pointer ${item.logo || isDKP || isDashboard ? "justify-center" : ""
           }`}
         onClick={handleClick}
         aria-expanded={isExpandable ? isItemExpanded : undefined}
@@ -114,25 +115,32 @@ export const NavItemComponent = ({
           />
         ) : null}
         {chevronMarkup}
-        <span
-          className={`relative z-10 flex items-center justify-center rounded-md ${!item.logo && !isDKP ? iconClasses : ""
-            } ${iconOffsetClass}`}
-        >
-          {item.logo ? (
-            <img
-              src={item.logo}
-              alt={item.label}
-              className={`h-16 object-contain ${isSidebarOpen ? "w-auto max-w-[170px]" : "w-16"
-                }`}
-            />
-          ) : isDKP ? (
-            <span className="text-lg font-semibold">DKP</span>
-          ) : item.icon ? (
-            <item.icon />
-          ) : null}
-        </span>
+        {(!isDashboard || !isSidebarOpen) && (
+          <span
+            className={`relative z-10 flex items-center justify-center rounded-md ${!item.logo && !isDKP ? iconClasses : ""
+              } ${iconOffsetClass}`}
+          >
+            {item.logo ? (
+              <img
+                src={item.logo}
+                alt={item.label}
+                className={`h-16 object-contain ${isSidebarOpen ? "w-auto max-w-[170px]" : "w-16"
+                  }`}
+              />
+            ) : isDKP ? (
+              <span className="text-lg font-semibold">DKP</span>
+            ) : isDashboard ? (
+              <span className="text-lg font-semibold">DB</span>
+            ) : item.icon ? (
+              <item.icon />
+            ) : null}
+          </span>
+        )}
         {isSidebarOpen && !item.logo && !isDKP ? (
-          <span className="relative text-sm font-normal z-10 whitespace-nowrap text-left">
+          <span
+            className={`relative z-10 whitespace-nowrap text-center ${isDashboard ? "text-2xl " : "text-sm "
+              }`}
+          >
             {item.label}
           </span>
         ) : null}

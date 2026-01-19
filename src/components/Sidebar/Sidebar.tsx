@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import React, { useEffect, memo } from "react";
 import type { SetStateAction } from "react";
 import { Sidebar as SidebarRoot, SidebarBody } from "@/components/ui/sidebar";
+import Link from "next/link";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useSidebarStore } from "@/store/sidebarStore";
 import { usePathname } from "next/navigation";
@@ -55,9 +56,9 @@ const SidebarComponent = () => {
     <SidebarRoot open={isSidebarOpen} setOpen={handleSetOpen} animate>
       <SidebarBody className=" border-r border-border bg-sidebar h-screen max-h-screen">
         <div className="flex items-center h-16 px-5 border-b border-border">
-          <h1 className="text-lg font-semibold text-sidebar-foreground">
-            {isSidebarOpen ? "OnePlace" : "OP"}
-          </h1>
+          <Link href="/overall" className="text-2xl font-medium text-sidebar-foreground hover:opacity-80 transition-opacity">
+            Oneplace
+          </Link>
         </div>
         <ScrollArea className=" pt-6 pr-4 h-[calc(100vh-64px)] max-h-[calc(100vh-64px)]">
           <div className="flex-1 space-y-6 pr-1 px-5">

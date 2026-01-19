@@ -29,7 +29,7 @@ export const SidebarContent = ({
 
   return (
     <div key={section.title} className="space-y-3">
-      {isSidebarOpen ? (
+      {isSidebarOpen && section.title ? (
         section.title === "Favorites" ? (
           <div className="flex items-center gap-8 text-sm text-muted-foreground ">
             <span>Favorites</span>
