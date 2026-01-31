@@ -1,4 +1,5 @@
 // Authentication utilities and API calls
+import { useAuthStore, AuthUser } from "@/store/auth-store";
 
 export interface LoginResponse {
   status: boolean;
@@ -11,13 +12,7 @@ export interface LoginResponse {
   message: string;
 }
 
-export interface User {
-  token: string;
-  id: number;
-  name: string;
-  email: string;
-  role: "admin" | "organizer";
-}
+export type User = AuthUser;
 
 // API base URL - update this with your actual API URL
 const API_BASE_URL =
@@ -49,42 +44,26 @@ export function getUserRole(id: number): "admin" | "organizer" {
 }
 
 export function saveAuthData(data: LoginResponse["data"]): void {
-  if (typeof window !== "undefined") {
-    localStorage.setItem("auth_token", data.token);
-    localStorage.setItem(
-      "user",
-      JSON.stringify({
-        ...data,
-        role: getUserRole(data.id),
-      }),
-    );
-  }
+  const role = getUserRole(data.id);
+  const user: AuthUser = {
+    ...data,
+    role,
+  };
+  useAuthStore.getState().setUser(user);
 }
 
 export function getAuthToken(): string | null {
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("auth_token");
-  }
-  return null;
+  return useAuthStore.getState().user?.token || null;
 }
 
 export function getUser(): User | null {
-  if (typeof window !== "undefined") {
-    const user = localStorage.getItem("user");
-    if (user) {
-      return JSON.parse(user);
-    }
-  }
-  return null;
+  return useAuthStore.getState().user;
 }
 
 export function logout(): void {
-  if (typeof window !== "undefined") {
-    localStorage.removeItem("auth_token");
-    localStorage.removeItem("user");
-  }
+  useAuthStore.getState().logout();
 }
 
 export function isAuthenticated(): boolean {
-  return !!getAuthToken();
+  return useAuthStore.getState().isAuthenticated;
 }
