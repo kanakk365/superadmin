@@ -14,7 +14,9 @@ import {
 import { useSidebarStore } from "@/store/sidebarStore";
 import { useNotificationPanelStore } from "@/store/notificationPanelStore";
 import { useTheme } from "@/components/providers/theme-provider";
-import { Moon } from "lucide-react";
+import { Moon, LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/auth-store";
 
 type NavbarProps = {
   sectionLabel: string;
@@ -24,15 +26,22 @@ type NavbarProps = {
 const Navbar = ({ sectionLabel, pageLabel }: NavbarProps) => {
   const toggleSidebar = useSidebarStore((state) => state.toggle);
   const toggleNotifications = useNotificationPanelStore(
-    (state) => state.toggle
+    (state) => state.toggle,
   );
 
   const [animatingIcons, setAnimatingIcons] = useState<Set<string>>(new Set());
   const { theme, toggleTheme, isLoaded } = useTheme();
+  const router = useRouter();
+  const { logout } = useAuthStore();
+
+  const handleLogout = useCallback(() => {
+    logout();
+    router.push("/login");
+  }, [logout, router]);
 
   const themeIcon = useMemo(
     () => (theme === "dark" ? <Moon className="h-4 w-4" /> : <IconSun />),
-    [theme]
+    [theme],
   );
 
   const triggerAnimation = useCallback(
@@ -48,12 +57,12 @@ const Navbar = ({ sectionLabel, pageLabel }: NavbarProps) => {
         });
       }, 600);
     },
-    []
+    [],
   );
 
   const isAnimating = useCallback(
     (iconName: string) => animatingIcons.has(iconName),
-    [animatingIcons]
+    [animatingIcons],
   );
 
   const handleSidebarToggle = useCallback(() => {
@@ -159,6 +168,17 @@ const Navbar = ({ sectionLabel, pageLabel }: NavbarProps) => {
         >
           <span className="sr-only">Toggle notifications panel</span>
           <IconBell />
+        </motion.button>
+        <motion.button
+          type="button"
+          onClick={handleLogout}
+          whileTap={{ scale: 0.9 }}
+          whileHover={{ scale: 1.1, color: "hsl(var(--destructive))" }}
+          className="grid place-items-center text-foreground transition cursor-pointer"
+          title="Logout"
+        >
+          <span className="sr-only">Logout</span>
+          <LogOut className="h-5 w-5" />
         </motion.button>
         <motion.button
           type="button"

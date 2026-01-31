@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { IconDot } from "@/lib/icons";
 import type { NavItem } from "./types";
+import { useAuthStore } from "@/store/auth-store";
 
 interface NavItemProps {
   item: NavItem;
@@ -29,6 +30,8 @@ export const NavItemComponent = ({
   onSetActiveItemKey,
 }: NavItemProps) => {
   const router = useRouter();
+  const { user } = useAuthStore();
+  const role = user?.role || "organizer";
 
   const isDotNav = item.icon === IconDot && !item.children;
   const isFavoritesSection = sectionTitle === "Favorites";
@@ -49,10 +52,11 @@ export const NavItemComponent = ({
       <motion.button
         key={item.label}
         type="button"
-        className={`relative flex items-center gap-3 rounded-full py-1 text-sm transition-colors cursor-pointer ${isItemActive
-          ? "text-sidebar-foreground"
-          : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
-          } ${isSidebarOpen ? "pl-1 pr-2 justify-start" : "justify-center px-0"}`}
+        className={`relative flex items-center gap-3 rounded-full py-1 text-sm transition-colors cursor-pointer ${
+          isItemActive
+            ? "text-sidebar-foreground"
+            : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
+        } ${isSidebarOpen ? "pl-1 pr-2 justify-start" : "justify-center px-0"}`}
         onClick={() => onSetActiveItemKey(itemKey)}
       >
         {isItemActive ? (
@@ -71,8 +75,9 @@ export const NavItemComponent = ({
   const isExpandable = Boolean(item.children?.length);
   const isItemExpanded = isExpandable ? isExpanded : false;
   const isHighlighted = isItemActive || isItemExpanded;
-  const containerBase = `relative flex items-center rounded-md ${isDashboard ? "py-6" : "py-2"} text-sm font-medium transition-all ${isSidebarOpen ? "gap-3 px-3" : "justify-center px-0"
-    }`;
+  const containerBase = `relative flex items-center rounded-md ${isDashboard ? "py-6" : "py-2"} text-sm font-medium transition-all ${
+    isSidebarOpen ? "gap-3 px-3" : "justify-center px-0"
+  }`;
 
   const stateClasses = isHighlighted
     ? "text-sidebar-foreground"
@@ -88,7 +93,11 @@ export const NavItemComponent = ({
       onToggleItem(item.label);
     }
     if (item.href) {
-      router.push(item.href);
+      if (item.label === "Battle Lounge" || item.label === "YSN") {
+        router.push(`${item.href}/${role}`);
+      } else {
+        router.push(item.href);
+      }
     }
   };
 
@@ -98,8 +107,9 @@ export const NavItemComponent = ({
     <div key={item.label} className="flex flex-col">
       <motion.button
         type="button"
-        className={`${containerBase} ${stateClasses} cursor-pointer ${item.logo || isDKP || isDashboard ? "justify-center" : ""
-          }`}
+        className={`${containerBase} ${stateClasses} cursor-pointer ${
+          item.logo || isDKP || isDashboard ? "justify-center" : ""
+        }`}
         onClick={handleClick}
         aria-expanded={isExpandable ? isItemExpanded : undefined}
       >
@@ -117,15 +127,17 @@ export const NavItemComponent = ({
         {chevronMarkup}
         {(!isDashboard || !isSidebarOpen) && (
           <span
-            className={`relative z-10 flex items-center justify-center rounded-md ${!item.logo && !isDKP ? iconClasses : ""
-              } ${iconOffsetClass}`}
+            className={`relative z-10 flex items-center justify-center rounded-md ${
+              !item.logo && !isDKP ? iconClasses : ""
+            } ${iconOffsetClass}`}
           >
             {item.logo ? (
               <img
                 src={item.logo}
                 alt={item.label}
-                className={`h-16 object-contain ${isSidebarOpen ? "w-auto max-w-[170px]" : "w-16"
-                  }`}
+                className={`h-16 object-contain ${
+                  isSidebarOpen ? "w-auto max-w-[170px]" : "w-16"
+                }`}
               />
             ) : isDKP ? (
               <span className="text-lg font-semibold">DKP</span>
@@ -138,8 +150,9 @@ export const NavItemComponent = ({
         )}
         {isSidebarOpen && !item.logo && !isDKP ? (
           <span
-            className={`relative z-10 whitespace-nowrap text-center ${isDashboard ? "text-2xl " : "text-sm "
-              }`}
+            className={`relative z-10 whitespace-nowrap text-center ${
+              isDashboard ? "text-2xl " : "text-sm "
+            }`}
           >
             {item.label}
           </span>

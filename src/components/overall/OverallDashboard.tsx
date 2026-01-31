@@ -257,7 +257,20 @@ const overallStats = [
   },
 ];
 
+import { useAuthStore } from "@/store/auth-store";
+
 export const OverallDashboard = () => {
+  const { user } = useAuthStore();
+  const role = user?.role || "organizer";
+
+  // Helper to get dynamic href based on role
+  const getProjectHref = (projectId: string, defaultHref: string) => {
+    if (projectId === "battle-lounge" || projectId === "ysn") {
+      return `${defaultHref}/${role}`;
+    }
+    return defaultHref;
+  };
+
   return (
     <ScrollArea className="h-full w-full bg-gradient-to-b from-muted/20 to-background">
       <div className="flex flex-col gap-6 lg:gap-8 px-4 sm:px-8 py-8 max-w-[1600px] mx-auto">
@@ -353,7 +366,13 @@ export const OverallDashboard = () => {
           {/* Full-width cards for each project */}
           <div className="flex flex-col gap-6">
             {projects.map((project, index) => (
-              <EnhancedProjectCard key={index} project={project} />
+              <EnhancedProjectCard
+                key={index}
+                project={{
+                  ...project,
+                  href: getProjectHref(project.id, project.href),
+                }}
+              />
             ))}
           </div>
         </div>
