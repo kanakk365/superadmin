@@ -81,16 +81,6 @@ export function PopularGamesPie({ data }: PopularGamesPieProps) {
     );
   }, [data, chartData]);
 
-  if (chartData.length === 0) {
-    return (
-      <Card className="flex flex-col h-full gap-10 rounded-[32px] border-border/40 shadow-sm overflow-hidden items-center justify-center p-6">
-        <span className="text-muted-foreground">
-          No popular games data available
-        </span>
-      </Card>
-    );
-  }
-
   return (
     <Card className="flex flex-col h-full gap-10 rounded-[32px] border-border/40 shadow-sm overflow-hidden">
       <CardHeader className="items-center pt-3">
@@ -98,56 +88,64 @@ export function PopularGamesPie({ data }: PopularGamesPieProps) {
         <CardDescription>Most played titles this month</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
-        <ChartContainer
-          config={DEFAULT_CHART_CONFIG}
-          className="mx-auto aspect-square max-h-[250px]"
-        >
-          <PieChart>
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
-            <Pie
-              data={chartData}
-              dataKey="players"
-              nameKey="game"
-              innerRadius={90}
-              outerRadius={120}
-              strokeWidth={5}
-              cy={125}
-            >
-              <Label
-                content={({ viewBox }) => {
-                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                    return (
-                      <text
-                        x={viewBox.cx}
-                        y={viewBox.cy}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                      >
-                        <tspan
+        {chartData.length > 0 ? (
+          <ChartContainer
+            config={DEFAULT_CHART_CONFIG}
+            className="mx-auto aspect-square max-h-[250px]"
+          >
+            <PieChart>
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent hideLabel />}
+              />
+              <Pie
+                data={chartData}
+                dataKey="players"
+                nameKey="game"
+                innerRadius={90}
+                outerRadius={120}
+                strokeWidth={5}
+                cy={125}
+              >
+                <Label
+                  content={({ viewBox }) => {
+                    if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                      return (
+                        <text
                           x={viewBox.cx}
                           y={viewBox.cy}
-                          className="fill-foreground text-3xl font-bold"
+                          textAnchor="middle"
+                          dominantBaseline="middle"
                         >
-                          {totalPlayers.toLocaleString()}
-                        </tspan>
-                        <tspan
-                          x={viewBox.cx}
-                          y={(viewBox.cy || 0) + 24}
-                          className="fill-muted-foreground text-xs"
-                        >
-                          Players
-                        </tspan>
-                      </text>
-                    );
-                  }
-                }}
-              />
-            </Pie>
-          </PieChart>
-        </ChartContainer>
+                          <tspan
+                            x={viewBox.cx}
+                            y={viewBox.cy}
+                            className="fill-foreground text-3xl font-bold"
+                          >
+                            {totalPlayers.toLocaleString()}
+                          </tspan>
+                          <tspan
+                            x={viewBox.cx}
+                            y={(viewBox.cy || 0) + 24}
+                            className="fill-muted-foreground text-xs"
+                          >
+                            Players
+                          </tspan>
+                        </text>
+                      );
+                    }
+                  }}
+                />
+              </Pie>
+            </PieChart>
+          </ChartContainer>
+        ) : (
+          <div className="h-[250px] flex items-center justify-center">
+            <span className="text-muted-foreground">
+              No popular games data available
+            </span>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

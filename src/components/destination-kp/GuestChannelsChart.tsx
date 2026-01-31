@@ -1,159 +1,143 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import * as React from "react";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { DollarSign } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
 } from "@/components/ui/chart";
 import {
-  Area,
-  CartesianGrid,
-  Line,
-  LineChart as RechartsLineChart,
-  XAxis,
-  YAxis,
-} from "recharts";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-const chartData = [
-  { date: "Apr 4", digital: 40, campus: 20 },
-  { date: "Apr 10", digital: 120, campus: 40 },
-  { date: "Apr 16", digital: 160, campus: 60 },
-  { date: "Apr 22", digital: 180, campus: 110 },
-  { date: "Apr 28", digital: 165, campus: 115 },
-  { date: "May 4", digital: 155, campus: 85 },
-  { date: "May 10", digital: 165, campus: 95 },
-  { date: "May 16", digital: 160, campus: 60 },
-  { date: "May 22", digital: 175, campus: 120 },
-  { date: "May 28", digital: 165, campus: 110 },
-  { date: "Jun 3", digital: 155, campus: 60 },
-  { date: "Jun 9", digital: 150, campus: 50 },
-  { date: "Jun 15", digital: 160, campus: 150 },
-  { date: "Jun 21", digital: 168, campus: 160 },
-  { date: "Jun 30", digital: 160, campus: 70 },
+const monthData = [
+  { name: "Jan", revenue: 4500 },
+  { name: "Feb", revenue: 5200 },
+  { name: "Mar", revenue: 4800 },
+  { name: "Apr", revenue: 6100 },
+  { name: "May", revenue: 5500 },
+  { name: "Jun", revenue: 6700 },
+  { name: "Jul", revenue: 7200 },
+  { name: "Aug", revenue: 6900 },
+  { name: "Sep", revenue: 7800 },
+  { name: "Oct", revenue: 8500 },
+  { name: "Nov", revenue: 9100 },
+  { name: "Dec", revenue: 9800 },
+];
+
+const pageData = [
+  { name: "Home", revenue: 12500 },
+  { name: "Dashboard", revenue: 8400 },
+  { name: "Marketplace", revenue: 15600 },
+  { name: "Battle Lounge", revenue: 9200 },
+  { name: "Profile", revenue: 4300 },
+  { name: "Settings", revenue: 2100 },
 ];
 
 const chartConfig = {
-  digital: {
-    label: "Digital Interest",
+  revenue: {
+    label: "Revenue",
     theme: {
-      light: "oklch(0.5417 0.1790 288.0332)",
-      dark: "oklch(0.7162 0.1597 290.3962)",
-    },
-  },
-  campus: {
-    label: "On-site",
-    theme: {
-      light: "oklch(0.5679 0.2113 276.7065)",
-      dark: "oklch(0.7482 0.1235 244.7492)",
+      light: "#bd5bf1",
+      dark: "#bd5bf1",
     },
   },
 } satisfies ChartConfig;
 
 export const GuestChannelsChart = () => {
+  const [viewBy, setViewBy] = React.useState<"month" | "page">("month");
+
+  const currentData = viewBy === "month" ? monthData : pageData;
+
+  const totalRevenue = currentData.reduce((acc, item) => acc + item.revenue, 0);
+
   return (
-    <div className="rounded-3xl bg-card py-6 px-3 h-full">
-      <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground px-3 mb-8">
-        <p className="text-lg font-semibold text-foreground">Guest Channels</p>
-        <span className="hidden h-4 w-px bg-border md:block" />
-        <div className="flex items-center gap-6">
-          <span className="flex items-center gap-2 whitespace-nowrap">
-            <span className="h-2 w-2 rounded-full bg-[var(--color-digital)]" />
-            <span className="text-sm text-foreground">Digital</span>
-          </span>
-          <span className="flex items-center gap-2 whitespace-nowrap">
-            <span className="h-2 w-2 rounded-full bg-[var(--color-campus)]" />
-            <span className="text-sm text-foreground">On-site</span>
-          </span>
+    <Card className="rounded-3xl border-border/40 shadow-sm h-full">
+      <CardHeader className="flex flex-col gap-4 border-b py-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-4">
+          <div className="p-3 bg-gradient-to-br from-purple-500/20 to-fuchsia-500/20 rounded-2xl">
+            <DollarSign className="w-6 h-6 text-purple-500" />
+          </div>
+          <div>
+            <CardTitle className="text-xl">Revenue Analytics</CardTitle>
+            <CardDescription>Overview of revenue performance</CardDescription>
+          </div>
         </div>
-      </div>
+        <Select
+          value={viewBy}
+          onValueChange={(value) => setViewBy(value as "month" | "page")}
+        >
+          <SelectTrigger className="w-[120px] h-9 bg-muted/50 border-0 focus:ring-0 rounded-lg">
+            <SelectValue placeholder="Select view" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="month">Monthly</SelectItem>
+            <SelectItem value="page">Page Wise</SelectItem>
+          </SelectContent>
+        </Select>
+      </CardHeader>
 
-      <div className="h-[300px] w-full">
-        <ChartContainer config={chartConfig} className="h-full w-full">
-          <RechartsLineChart
-            data={chartData}
-            margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
+      <CardContent className="p-6">
+        <div className="mb-6 flex items-center gap-2">
+          <span className="text-2xl font-bold text-foreground">
+            ${totalRevenue.toLocaleString()}
+          </span>
+          <span className="text-sm text-muted-foreground">total revenue</span>
+        </div>
+
+        <ChartContainer config={chartConfig} className="h-[300px] w-full">
+          <BarChart
+            data={currentData}
+            margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
           >
-            <defs>
-              <linearGradient id="fillDigital" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-digital)"
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-digital)"
-                  stopOpacity={0.1}
-                />
-              </linearGradient>
-              <linearGradient id="fillCampus" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-campus)"
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-campus)"
-                  stopOpacity={0.1}
-                />
-              </linearGradient>
-            </defs>
-
             <CartesianGrid
-              strokeDasharray="3 3"
               vertical={false}
-              stroke="var(--line-grid-stroke)"
+              strokeDasharray="3 3"
+              stroke="hsl(var(--border))"
             />
             <XAxis
-              dataKey="date"
-              axisLine={false}
+              dataKey="name"
               tickLine={false}
-              tickMargin={12}
-              padding={{ left: 10, right: 10 }}
+              axisLine={false}
+              tickMargin={10}
+              fontSize={12}
             />
             <YAxis
-              axisLine={false}
               tickLine={false}
-              tickMargin={16}
-              padding={{ top: 20, bottom: 20 }}
+              axisLine={false}
+              tickMargin={10}
+              fontSize={12}
+              tickFormatter={(value) => `$${value}`}
             />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-
-            <Area
-              type="monotone"
-              dataKey="digital"
-              stroke="none"
-              fill="url(#fillDigital)"
-              fillOpacity={0.6}
+            <ChartTooltip
+              cursor={{ fill: "hsl(var(--muted))", opacity: 0.3 }}
+              content={<ChartTooltipContent indicator="line" />}
             />
-            <Area
-              type="monotone"
-              dataKey="campus"
-              stroke="none"
-              fill="url(#fillCampus)"
-              fillOpacity={0.6}
+            <Bar
+              dataKey="revenue"
+              fill="var(--color-revenue)"
+              radius={[4, 4, 0, 0]}
+              maxBarSize={50}
             />
-
-            <Line
-              type="monotone"
-              dataKey="digital"
-              stroke="var(--color-digital)"
-              strokeWidth={2}
-              dot={false}
-            />
-            <Line
-              type="monotone"
-              dataKey="campus"
-              stroke="var(--color-campus)"
-              strokeWidth={2}
-              dot={false}
-            />
-          </RechartsLineChart>
+          </BarChart>
         </ChartContainer>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };

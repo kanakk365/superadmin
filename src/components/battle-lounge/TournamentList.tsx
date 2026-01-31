@@ -47,13 +47,21 @@ const mapTournamentToDetail = (t: Tournament): TournamentDetail => ({
 });
 
 const getGameIcon = (game: string) => {
-  if (game.includes("Call of Duty") || game.includes("CS2") || game.includes("Counter")) {
+  if (
+    game.includes("Call of Duty") ||
+    game.includes("CS2") ||
+    game.includes("Counter")
+  ) {
     return Crosshair;
   }
   if (game.includes("Fortnite") || game.includes("Apex")) {
     return Target;
   }
-  if (game.includes("Tekken") || game.includes("SF6") || game.includes("Street Fighter")) {
+  if (
+    game.includes("Tekken") ||
+    game.includes("SF6") ||
+    game.includes("Street Fighter")
+  ) {
     return Swords;
   }
   return Gamepad2;
@@ -65,9 +73,11 @@ const getGameBg = (game: string) => {
   if (game.includes("Apex")) return "bg-red-500/10";
   if (game.includes("Valorant")) return "bg-rose-500/10";
   if (game.includes("FC") || game.includes("FIFA")) return "bg-blue-500/10";
-  if (game.includes("CS2") || game.includes("Counter")) return "bg-yellow-500/10";
+  if (game.includes("CS2") || game.includes("Counter"))
+    return "bg-yellow-500/10";
   if (game.includes("Tekken")) return "bg-orange-500/10";
-  if (game.includes("SF6") || game.includes("Street Fighter")) return "bg-indigo-500/10";
+  if (game.includes("SF6") || game.includes("Street Fighter"))
+    return "bg-indigo-500/10";
   return "bg-muted/50";
 };
 
@@ -151,95 +161,103 @@ export const TournamentList = ({
         </div>
 
         <div className="flex-1 overflow-auto">
-          <div className="flex flex-col p-4 gap-2">
-            {filteredTournaments.map((t) => {
-              const Icon = getGameIcon(t.game);
-              const bg = getGameBg(t.game);
+          {filteredTournaments.length > 0 ? (
+            <div className="flex flex-col p-4 gap-2">
+              {filteredTournaments.map((t) => {
+                const Icon = getGameIcon(t.game);
+                const bg = getGameBg(t.game);
 
-              return (
-                <div
-                  key={t.id}
-                  onClick={() => handleViewDetails(t)}
-                  className="group flex items-center justify-between p-4 rounded-2xl hover:bg-muted/40 border border-transparent hover:border-border/40 transition-all duration-200 cursor-pointer"
-                >
-                  <div className="flex items-center gap-4">
-                    <div
-                      className={cn("p-3 rounded-2xl transition-colors", bg)}
-                    >
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <span className="font-semibold text-foreground group-hover:text-primary transition-colors">
-                        {t.name}
-                      </span>
-                      <span className="text-xs font-medium text-muted-foreground">
-                        {t.game}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-6 md:gap-12">
-                    <div className="hidden md:flex flex-col items-end gap-1 min-w-[80px]">
-                      <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Prize Pool
-                      </span>
-                      <span className="font-bold text-foreground">
-                        {t.prizeAmount}
-                      </span>
-                    </div>
-
-                    <div className="hidden lg:flex flex-col items-end gap-1 min-w-[70px]">
-                      <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Players
-                      </span>
-                      <span className="font-bold text-foreground">
-                        {t.totalPlayers}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-4 min-w-[140px] justify-end">
-                      <span
-                        className={cn(
-                          "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold border",
-                          t.status === "live" &&
-                            "bg-fuchsia-500/10 text-fuchsia-600 border-fuchsia-500/20 dark:text-fuchsia-400",
-                          t.status === "upcoming" &&
-                            "bg-purple-500/10 text-purple-600 border-purple-500/20 dark:text-purple-400",
-                          t.status === "completed" &&
-                            "bg-muted text-muted-foreground border-border",
-                        )}
+                return (
+                  <div
+                    key={t.id}
+                    onClick={() => handleViewDetails(t)}
+                    className="group flex items-center justify-between p-4 rounded-2xl hover:bg-muted/40 border border-transparent hover:border-border/40 transition-all duration-200 cursor-pointer"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div
+                        className={cn("p-3 rounded-2xl transition-colors", bg)}
                       >
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <span className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                          {t.name}
+                        </span>
+                        <span className="text-xs font-medium text-muted-foreground">
+                          {t.game}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-6 md:gap-12">
+                      <div className="hidden md:flex flex-col items-end gap-1 min-w-[80px]">
+                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                          Prize Pool
+                        </span>
+                        <span className="font-bold text-foreground">
+                          {t.prizeAmount}
+                        </span>
+                      </div>
+
+                      <div className="hidden lg:flex flex-col items-end gap-1 min-w-[70px]">
+                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                          Players
+                        </span>
+                        <span className="font-bold text-foreground">
+                          {t.totalPlayers}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-4 min-w-[140px] justify-end">
                         <span
                           className={cn(
-                            "w-1.5 h-1.5 rounded-full",
+                            "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold border",
                             t.status === "live" &&
-                              "bg-fuchsia-500 animate-pulse",
-                            t.status === "upcoming" && "bg-purple-500",
-                            t.status === "completed" && "bg-muted-foreground",
+                              "bg-fuchsia-500/10 text-fuchsia-600 border-fuchsia-500/20 dark:text-fuchsia-400",
+                            t.status === "upcoming" &&
+                              "bg-purple-500/10 text-purple-600 border-purple-500/20 dark:text-purple-400",
+                            t.status === "completed" &&
+                              "bg-muted text-muted-foreground border-border",
                           )}
-                        ></span>
-                        {t.status === "live"
-                          ? "Live Now"
-                          : t.status === "upcoming"
-                            ? "Upcoming"
-                            : "Completed"}
-                      </span>
+                        >
+                          <span
+                            className={cn(
+                              "w-1.5 h-1.5 rounded-full",
+                              t.status === "live" &&
+                                "bg-fuchsia-500 animate-pulse",
+                              t.status === "upcoming" && "bg-purple-500",
+                              t.status === "completed" && "bg-muted-foreground",
+                            )}
+                          ></span>
+                          {t.status === "live"
+                            ? "Live Now"
+                            : t.status === "upcoming"
+                              ? "Upcoming"
+                              : "Completed"}
+                        </span>
 
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleViewDetails(t);
-                        }}
-                        className="p-2 rounded-lg hover:bg-muted transition-colors opacity-0 group-hover:opacity-100"
-                      >
-                        <Eye className="w-4 h-4 text-muted-foreground" />
-                      </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleViewDetails(t);
+                          }}
+                          className="p-2 rounded-lg hover:bg-muted transition-colors opacity-0 group-hover:opacity-100"
+                        >
+                          <Eye className="w-4 h-4 text-muted-foreground" />
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="h-full flex items-center justify-center p-4">
+              <span className="text-muted-foreground">
+                No tournaments found
+              </span>
+            </div>
+          )}
         </div>
       </div>
 

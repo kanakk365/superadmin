@@ -1,6 +1,4 @@
-import { getAuthToken } from "@/lib/auth";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://oneplace.io";
+import { apiClient } from "@/lib/api-client";
 
 export interface OrganizerStats {
   total: number;
@@ -48,31 +46,7 @@ export interface PopularGamesData {
 async function fetchWithAuth<T>(
   endpoint: string,
 ): Promise<{ status: boolean; data: T; message: string }> {
-  const token = getAuthToken();
-  const headers: HeadersInit = {
-    Accept: "application/json",
-    "Content-Type": "application/json",
-  };
-
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`; // Use just token because saved token might include scheme or not.
-    // Wait, let's verify how the token is saved.
-    // In auth.ts: localStorage.setItem("auth_token", data.token);
-    // The user provided: "token": "10|DjZY..."
-    // So it's just the token. The header should be `Bearer ${token}`.
-  }
-
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    method: "GET",
-    headers,
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || `API Error: ${response.statusText}`);
-  }
-
-  return response.json();
+  return apiClient<T>(endpoint);
 }
 
 export const getOrganizerStats = async () => {
