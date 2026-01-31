@@ -33,7 +33,17 @@ const revenueData = [
   { name: "Dec", value: 12500 },
 ];
 
-export const BattleLoungeStats = () => {
+import { OrganizerStats } from "@/lib/api/battle-lounge/organizer";
+
+interface BattleLoungeStatsProps {
+  stats?: OrganizerStats;
+  totalRevenue?: number;
+}
+
+export const BattleLoungeStats = ({
+  stats,
+  totalRevenue,
+}: BattleLoungeStatsProps) => {
   return (
     <div className="grid gap-5 lg:gap-7.5">
       {/* First Row - Bento Grid: 2x2 Stats + Large Revenue Card */}
@@ -42,33 +52,33 @@ export const BattleLoungeStats = () => {
         <div className="lg:col-span-1">
           <div className="grid grid-cols-2 gap-4 lg:gap-6 h-full items-stretch">
             <StatCard
-              value="32"
+              value={stats?.completed?.toString() || "0"}
               label="Completed"
               icon={<CheckCircle className="w-5 h-5" />}
-              change="+5"
+              change="--"
               delay={0}
             />
             <StatCard
-              value="8"
+              value={stats?.live?.toString() || "0"}
               label="Live Now"
               icon={<PlayCircle className="w-5 h-5" />}
-              change="+2"
+              change="--"
               highlight
               delay={100}
             />
             <StatCard
-              value="15"
+              value={stats?.upcomming?.toString() || "0"}
               label="Upcoming"
               icon={<Calendar className="w-5 h-5" />}
-              change="+4"
+              change="--"
               delay={200}
               highlight
             />
             <StatCard
-              value="3"
+              value={stats?.canceled?.toString() || "0"}
               label="Cancelled"
               icon={<Ban className="w-5 h-5" />}
-              change="-1"
+              change="--"
               tone="negative"
               delay={300}
             />
@@ -89,7 +99,7 @@ export const BattleLoungeStats = () => {
                       Total Revenue
                     </p>
                     <h3 className="text-4xl lg:text-5xl font-bold tracking-tight mt-1 text-white">
-                      $12.5K
+                      ${totalRevenue?.toLocaleString() || "0"}
                     </h3>
                   </div>
                 </div>
@@ -178,8 +188,14 @@ export const BattleLoungeStats = () => {
   );
 };
 
+import { OrganizerUsersData } from "@/lib/api/battle-lounge/organizer";
+
+interface UsersCardProps {
+  data?: OrganizerUsersData;
+}
+
 // Export Users Card as a separate component
-export const UsersCard = () => {
+export const UsersCard = ({ data }: UsersCardProps) => {
   return (
     <div className="group rounded-[32px] bg-card border border-border/40 p-4 lg:p-6 h-full shadow-sm hover:shadow-md transition-all duration-300">
       <div className="flex items-center justify-between mb-6">
@@ -201,9 +217,16 @@ export const UsersCard = () => {
           </span>
           <div className="flex items-baseline gap-3">
             <span className="text-4xl font-bold text-foreground tracking-tight">
-              5,400
+              {data?.totalParticipatedUsers?.count.toLocaleString() || "0"}
             </span>
-            <TrendBadge change="+8%" tone="positive" />
+            <TrendBadge
+              change={`${data?.totalParticipatedUsers?.growth || 0}%`}
+              tone={
+                (data?.totalParticipatedUsers?.growth || 0) >= 0
+                  ? "positive"
+                  : "negative"
+              }
+            />
           </div>
         </div>
 
@@ -213,20 +236,20 @@ export const UsersCard = () => {
           <MetricRow
             icon={<Activity className="w-4 h-4" />}
             label="Active Users"
-            value="2,100"
-            change="+12%"
+            value={data?.totalActiveUsers?.count.toLocaleString() || "0"}
+            change={`${data?.totalActiveUsers?.growth || 0}%`}
           />
           <MetricRow
             icon={<UserCheck className="w-4 h-4" />}
             label="Regular Users"
-            value="4,800"
-            change="+6%"
+            value="--"
+            change="0%"
           />
           <MetricRow
             icon={<UserPlus className="w-4 h-4" />}
             label="Organizers"
-            value="600"
-            change="+15%"
+            value={data?.totalOrganizerPlayer?.count.toLocaleString() || "0"}
+            change={`${data?.totalOrganizerPlayer?.growth || 0}%`}
           />
         </div>
       </div>
@@ -256,7 +279,7 @@ const StatCard = ({
       "group flex flex-col justify-between gap-4 h-full rounded-[28px] p-5 lg:p-6 border transition-all duration-300 hover:-translate-y-1 hover:shadow-lg",
       highlight
         ? "bg-gradient-to-br from-primary to-primary/90 text-white border-transparent shadow-lg shadow-primary/25"
-        : "bg-card border-border/40 hover:border-border/80"
+        : "bg-card border-border/40 hover:border-border/80",
     )}
     style={{ animationDelay: `${delay}ms` }}
   >
@@ -264,7 +287,7 @@ const StatCard = ({
       <div
         className={cn(
           "p-2.5 rounded-xl transition-transform group-hover:scale-110 duration-300",
-          highlight ? "bg-white/20 backdrop-blur-sm" : "bg-muted/50"
+          highlight ? "bg-white/20 backdrop-blur-sm" : "bg-muted/50",
         )}
       >
         {icon}
@@ -275,8 +298,8 @@ const StatCard = ({
           highlight
             ? "bg-white/20 text-white"
             : tone === "positive"
-            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-            : "bg-red-500/10 text-red-600 dark:text-red-400"
+              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+              : "bg-red-500/10 text-red-600 dark:text-red-400",
         )}
       >
         {change}
@@ -286,7 +309,7 @@ const StatCard = ({
       <span
         className={cn(
           "text-3xl font-bold tracking-tight",
-          highlight ? "text-white" : "text-foreground"
+          highlight ? "text-white" : "text-foreground",
         )}
       >
         {value}
@@ -294,7 +317,7 @@ const StatCard = ({
       <span
         className={cn(
           "text-sm font-medium",
-          highlight ? "text-white/80" : "text-muted-foreground"
+          highlight ? "text-white/80" : "text-muted-foreground",
         )}
       >
         {label}
@@ -332,7 +355,7 @@ const MetricRow = ({
           "text-xs font-bold px-1.5 py-0.5 rounded-md",
           tone === "positive"
             ? "text-emerald-600 bg-emerald-500/10 dark:text-emerald-400"
-            : "text-red-600 bg-red-500/10 dark:text-red-400"
+            : "text-red-600 bg-red-500/10 dark:text-red-400",
         )}
       >
         {change}
