@@ -2,7 +2,7 @@
 
 import { TrendBadge } from "../dashboard/TrendBadge";
 import { cn } from "@/lib/utils";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Area, AreaChart, ResponsiveContainer, Tooltip } from "recharts";
 import {
   Users,
@@ -12,6 +12,7 @@ import {
   Building2,
   Calendar,
 } from "lucide-react";
+import { getDKPCount, DKPCountStat } from "@/lib/api/dkp";
 
 const revenueData = [
   { name: "Jan", value: 8500 },
@@ -28,7 +29,46 @@ const revenueData = [
   { name: "Dec", value: 20500 },
 ];
 
+// Icon mapping for different stat labels
+const getIconForLabel = (label: string) => {
+  const lowerLabel = label.toLowerCase();
+  if (lowerLabel.includes("visitor")) return <Users className="w-5 h-5" />;
+  if (lowerLabel.includes("subscriber")) return <Mail className="w-5 h-5" />;
+  if (lowerLabel.includes("contact")) return <Building2 className="w-5 h-5" />;
+  if (lowerLabel.includes("job")) return <Briefcase className="w-5 h-5" />;
+  return <Calendar className="w-5 h-5" />;
+};
+
+// Determine if a stat should be highlighted
+const isHighlightedStat = (label: string) => {
+  const lowerLabel = label.toLowerCase();
+  return lowerLabel.includes("subscriber") || lowerLabel.includes("contact");
+};
+
 export const DestinationKPStats = () => {
+  const [stats, setStats] = useState<DKPCountStat[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoading(true);
+        const response = await getDKPCount();
+        if (response.status && response.data) {
+          setStats(response.data);
+        }
+      } catch (err) {
+        setError("Failed to load stats");
+        console.error("Error fetching DKP stats:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
   return (
     <div className="grid gap-5 lg:gap-7.5">
       {/* First Row - Bento Grid: 2x2 Stats + Large Revenue Card */}
@@ -36,36 +76,73 @@ export const DestinationKPStats = () => {
         {/* Small Stats Grid - 2x2 Destination KP Stats */}
         <div className="lg:col-span-1">
           <div className="grid grid-cols-2 gap-4 lg:gap-6 h-full items-stretch">
-            <StatCard
-              value="15.4K"
-              label="Visitors"
-              icon={<Users className="w-5 h-5" />}
-              change="+8%"
-              delay={0}
-            />
-            <StatCard
-              value="2.9K"
-              label="Subscribers"
-              icon={<Mail className="w-5 h-5" />}
-              change="+24%"
-              highlight
-              delay={100}
-            />
-            <StatCard
-              value="45"
-              label="Contact Requests"
-              icon={<Building2 className="w-5 h-5" />}
-              change="+5%"
-              delay={200}
-              highlight
-            />
-            <StatCard
-              value="12"
-              label="Active Jobs"
-              icon={<Briefcase className="w-5 h-5" />}
-              change="0%"
-              delay={300}
-            />
+            {loading ? (
+              // Loading skeleton
+              <>
+                {[0, 1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="rounded-[28px] bg-card border border-border/40 p-5 lg:p-6 animate-pulse"
+                  >
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="w-10 h-10 bg-muted/50 rounded-xl" />
+                      <div className="w-12 h-5 bg-muted/50 rounded-full" />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <div className="w-16 h-8 bg-muted/50 rounded" />
+                      <div className="w-20 h-4 bg-muted/50 rounded" />
+                    </div>
+                  </div>
+                ))}
+              </>
+            ) : error ? (
+              // Error state with default values
+              <>
+                <StatCard
+                  value="--"
+                  label="Visitors"
+                  icon={<Users className="w-5 h-5" />}
+                  change="0%"
+                  delay={0}
+                />
+                <StatCard
+                  value="--"
+                  label="Subscribers"
+                  icon={<Mail className="w-5 h-5" />}
+                  change="0%"
+                  highlight
+                  delay={100}
+                />
+                <StatCard
+                  value="--"
+                  label="Contact Req"
+                  icon={<Building2 className="w-5 h-5" />}
+                  change="0%"
+                  delay={200}
+                  highlight
+                />
+                <StatCard
+                  value="--"
+                  label="Active Jobs"
+                  icon={<Briefcase className="w-5 h-5" />}
+                  change="0%"
+                  delay={300}
+                />
+              </>
+            ) : (
+              // API data
+              stats.map((stat, index) => (
+                <StatCard
+                  key={stat.label}
+                  value={stat.count.toLocaleString()}
+                  label={stat.label}
+                  icon={getIconForLabel(stat.label)}
+                  change={stat.badge_count > 0 ? `+${stat.badge_count}` : "0"}
+                  highlight={isHighlightedStat(stat.label)}
+                  delay={index * 100}
+                />
+              ))
+            )}
           </div>
         </div>
 
@@ -194,7 +271,7 @@ const StatCard = ({
       "group flex flex-col justify-between gap-4 h-full rounded-[28px] p-5 lg:p-6 border transition-all duration-300 hover:-translate-y-1 hover:shadow-lg",
       highlight
         ? "bg-gradient-to-br from-indigo-400 to-purple-400 text-white border-transparent shadow-lg shadow-indigo-400/25"
-        : "bg-card border-border/40 hover:border-border/80"
+        : "bg-card border-border/40 hover:border-border/80",
     )}
     style={{ animationDelay: `${delay}ms` }}
   >
@@ -202,7 +279,7 @@ const StatCard = ({
       <div
         className={cn(
           "p-2.5 rounded-xl transition-transform group-hover:scale-110 duration-300",
-          highlight ? "bg-white/20 backdrop-blur-sm" : "bg-muted/50"
+          highlight ? "bg-white/20 backdrop-blur-sm" : "bg-muted/50",
         )}
       >
         {icon}
@@ -213,8 +290,8 @@ const StatCard = ({
           highlight
             ? "bg-white/20 text-white"
             : tone === "positive"
-            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-            : "bg-red-500/10 text-red-600 dark:text-red-400"
+              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+              : "bg-red-500/10 text-red-600 dark:text-red-400",
         )}
       >
         {change}
@@ -224,7 +301,7 @@ const StatCard = ({
       <span
         className={cn(
           "text-3xl font-bold tracking-tight",
-          highlight ? "text-white" : "text-foreground"
+          highlight ? "text-white" : "text-foreground",
         )}
       >
         {value}
@@ -232,7 +309,7 @@ const StatCard = ({
       <span
         className={cn(
           "text-sm font-medium",
-          highlight ? "text-white/80" : "text-muted-foreground"
+          highlight ? "text-white/80" : "text-muted-foreground",
         )}
       >
         {label}
