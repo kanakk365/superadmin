@@ -60,8 +60,14 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export const GuestChannelsChart = () => {
-  const [viewBy, setViewBy] = React.useState<"month" | "page">("month");
+export const GuestChannelsChart = ({
+  fixedView,
+}: {
+  fixedView?: "month" | "page";
+}) => {
+  const [viewBy, setViewBy] = React.useState<"month" | "page">(
+    fixedView || "month",
+  );
 
   const currentData = viewBy === "month" ? monthData : pageData;
 
@@ -75,22 +81,30 @@ export const GuestChannelsChart = () => {
             <DollarSign className="w-6 h-6 text-purple-500" />
           </div>
           <div>
-            <CardTitle className="text-xl">Revenue Analytics</CardTitle>
+            <CardTitle className="text-xl">
+              {fixedView
+                ? fixedView === "month"
+                  ? "Monthly Revenue"
+                  : "Revenue by Page"
+                : "Revenue Analytics"}
+            </CardTitle>
             <CardDescription>Overview of revenue performance</CardDescription>
           </div>
         </div>
-        <Select
-          value={viewBy}
-          onValueChange={(value) => setViewBy(value as "month" | "page")}
-        >
-          <SelectTrigger className="w-[120px] h-9 bg-muted/50 border-0 focus:ring-0 rounded-lg">
-            <SelectValue placeholder="Select view" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="month">Monthly</SelectItem>
-            <SelectItem value="page">Page Wise</SelectItem>
-          </SelectContent>
-        </Select>
+        {!fixedView && (
+          <Select
+            value={viewBy}
+            onValueChange={(value) => setViewBy(value as "month" | "page")}
+          >
+            <SelectTrigger className="w-[120px] h-9 bg-muted/50 border-0 focus:ring-0 rounded-lg">
+              <SelectValue placeholder="Select view" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="month">Monthly</SelectItem>
+              <SelectItem value="page">Page Wise</SelectItem>
+            </SelectContent>
+          </Select>
+        )}
       </CardHeader>
 
       <CardContent className="p-6">
