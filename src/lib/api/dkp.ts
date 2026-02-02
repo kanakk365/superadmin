@@ -76,3 +76,33 @@ export interface EventAttendanceTrend {
 export const getEventAttendanceTrends = async () => {
   return apiClient<EventAttendanceTrend[]>("/api/dkp/event-attendance-trends");
 };
+
+// ===== Monthly Ad Revenue =====
+export interface MonthlyAdRevenueDataPoint {
+  label: string;
+  total: number;
+}
+
+export interface MonthlyAdRevenue {
+  total: number;
+  data: MonthlyAdRevenueDataPoint[];
+}
+
+export const getMonthlyAdRevenue = async () => {
+  return apiClient<MonthlyAdRevenue>("/api/dkp/monthly-ad-revenue");
+};
+
+// ===== Page Ad Revenue =====
+export interface PageAdRevenueDataPoint {
+  label: string;
+  total: string;
+}
+
+export interface PageAdRevenue {
+  total: number;
+  data: PageAdRevenueDataPoint[];
+}
+
+export const getPageAdRevenue = async () => {
+  return apiClient<PageAdRevenue>("/api/dkp/page-ad-revenue");
+};

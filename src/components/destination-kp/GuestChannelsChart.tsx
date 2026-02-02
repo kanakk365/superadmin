@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
-import { Users } from "lucide-react";
+import { DollarSign } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -15,34 +15,36 @@ import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-  ChartLegend,
-  ChartLegendContent,
 } from "@/components/ui/chart";
-import { getGuestChannel, GuestChannelData } from "@/lib/api/dkp";
+import {
+  getMonthlyAdRevenue,
+  getPageAdRevenue,
+  MonthlyAdRevenue,
+  PageAdRevenue,
+} from "@/lib/api/dkp";
 
 const chartConfig = {
-  digital: {
-    label: "Digital",
+  total: {
+    label: "Revenue",
     theme: {
-      light: "#8b5cf6",
-      dark: "#a78bfa",
-    },
-  },
-  on_site: {
-    label: "On-Site",
-    theme: {
-      light: "#ec4899",
-      dark: "#f472b6",
+      light: "#bd5bf1",
+      dark: "#bd5bf1",
     },
   },
 } satisfies ChartConfig;
+
+interface ChartDataPoint {
+  label: string;
+  total: number;
+}
 
 export const GuestChannelsChart = ({
   fixedView,
 }: {
   fixedView?: "month" | "page";
 }) => {
-  const [data, setData] = React.useState<GuestChannelData[]>([]);
+  const [data, setData] = React.useState<ChartDataPoint[]>([]);
+  const [totalRevenue, setTotalRevenue] = React.useState<number>(0);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -50,51 +52,70 @@ export const GuestChannelsChart = ({
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await getGuestChannel();
-        if (response.status && response.data) {
-          setData(response.data);
+
+        if (fixedView === "month") {
+          const response = await getMonthlyAdRevenue();
+          if (response.status && response.data) {
+            setData(
+              response.data.data.map((item) => ({
+                label: item.label,
+                total: item.total,
+              })),
+            );
+            setTotalRevenue(response.data.total);
+          }
+        } else if (fixedView === "page") {
+          const response = await getPageAdRevenue();
+          if (response.status && response.data) {
+            setData(
+              response.data.data.map((item) => ({
+                label: item.label.charAt(0).toUpperCase() + item.label.slice(1),
+                total: parseFloat(item.total),
+              })),
+            );
+            setTotalRevenue(response.data.total);
+          }
         }
       } catch (err) {
-        setError("Failed to load guest channel data");
-        console.error("Error fetching guest channel data:", err);
+        setError("Failed to load revenue data");
+        console.error("Error fetching ad revenue data:", err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [fixedView]);
 
-  const totalDigital = data.reduce((acc, item) => acc + item.digital, 0);
-  const totalOnSite = data.reduce((acc, item) => acc + item.on_site, 0);
-  const totalGuests = totalDigital + totalOnSite;
+  const formatCurrency = (value: number) => {
+    if (value >= 1000) {
+      return `$${(value / 1000).toFixed(0)}K`;
+    }
+    return `$${value.toLocaleString()}`;
+  };
 
   return (
     <Card className="rounded-3xl border-border/40 shadow-sm h-full">
       <CardHeader className="flex flex-col gap-4 border-b py-6 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
           <div className="p-3 bg-gradient-to-br from-purple-500/20 to-fuchsia-500/20 rounded-2xl">
-            <Users className="w-6 h-6 text-purple-500" />
+            <DollarSign className="w-6 h-6 text-purple-500" />
           </div>
           <div>
             <CardTitle className="text-xl">
               {fixedView === "month"
-                ? "Guest Channels by Week"
+                ? "Monthly Ad Revenue"
                 : fixedView === "page"
-                  ? "Guest Channels Overview"
-                  : "Guest Channels"}
+                  ? "Revenue by Category"
+                  : "Ad Revenue Analytics"}
             </CardTitle>
-            <CardDescription>Digital vs On-Site visitors</CardDescription>
-          </div>
-        </div>
-        <div className="flex items-center gap-4 text-sm">
-          <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-purple-500" />
-            <span className="text-muted-foreground">Digital</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-pink-500" />
-            <span className="text-muted-foreground">On-Site</span>
+            <CardDescription>
+              {fixedView === "month"
+                ? "Monthly advertising revenue breakdown"
+                : fixedView === "page"
+                  ? "Revenue breakdown by category"
+                  : "Overview of ad revenue performance"}
+            </CardDescription>
           </div>
         </div>
       </CardHeader>
@@ -114,16 +135,16 @@ export const GuestChannelsChart = ({
           </div>
         ) : data.length === 0 ? (
           <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-            No guest channel data available
+            No revenue data available
           </div>
         ) : (
           <>
             <div className="mb-6 flex items-center gap-2">
               <span className="text-2xl font-bold text-foreground">
-                {totalGuests.toLocaleString()}
+                {formatCurrency(totalRevenue)}
               </span>
               <span className="text-sm text-muted-foreground">
-                total guests
+                total revenue
               </span>
             </div>
 
@@ -149,22 +170,17 @@ export const GuestChannelsChart = ({
                   axisLine={false}
                   tickMargin={10}
                   fontSize={12}
+                  tickFormatter={(value) => `$${value}`}
                 />
                 <ChartTooltip
                   cursor={{ fill: "hsl(var(--muted))", opacity: 0.3 }}
                   content={<ChartTooltipContent indicator="line" />}
                 />
                 <Bar
-                  dataKey="digital"
-                  fill="var(--color-digital)"
+                  dataKey="total"
+                  fill="var(--color-total)"
                   radius={[4, 4, 0, 0]}
-                  maxBarSize={30}
-                />
-                <Bar
-                  dataKey="on_site"
-                  fill="var(--color-on_site)"
-                  radius={[4, 4, 0, 0]}
-                  maxBarSize={30}
+                  maxBarSize={50}
                 />
               </BarChart>
             </ChartContainer>
