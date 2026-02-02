@@ -12,21 +12,26 @@ import {
   Building2,
   Calendar,
 } from "lucide-react";
-import { getDKPCount, DKPCountStat } from "@/lib/api/dkp";
+import {
+  getDKPCount,
+  DKPCountStat,
+  getDKPRevenue,
+  DKPRevenue,
+} from "@/lib/api/dkp";
 
-const revenueData = [
-  { name: "Jan", value: 8500 },
-  { name: "Feb", value: 7200 },
-  { name: "Mar", value: 9800 },
-  { name: "Apr", value: 8900 },
-  { name: "May", value: 7500 },
-  { name: "Jun", value: 10200 },
-  { name: "Jul", value: 11500 },
-  { name: "Aug", value: 13200 },
-  { name: "Sep", value: 14800 },
-  { name: "Oct", value: 16500 },
-  { name: "Nov", value: 18200 },
-  { name: "Dec", value: 20500 },
+const monthNames = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
 ];
 
 // Icon mapping for different stat labels
@@ -50,6 +55,9 @@ export const DestinationKPStats = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [revenueData, setRevenueData] = useState<DKPRevenue | null>(null);
+  const [revenueLoading, setRevenueLoading] = useState(true);
+
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -66,8 +74,38 @@ export const DestinationKPStats = () => {
       }
     };
 
+    const fetchRevenue = async () => {
+      try {
+        setRevenueLoading(true);
+        const response = await getDKPRevenue();
+        if (response.status && response.data) {
+          setRevenueData(response.data);
+        }
+      } catch (err) {
+        console.error("Error fetching DKP revenue:", err);
+      } finally {
+        setRevenueLoading(false);
+      }
+    };
+
     fetchStats();
+    fetchRevenue();
   }, []);
+
+  // Transform revenue data for chart
+  const chartData =
+    revenueData?.data.map((item) => ({
+      name: monthNames[item.key] || `Month ${item.key}`,
+      value: item.value,
+    })) || [];
+
+  // Format amount for display
+  const formatAmount = (amount: number) => {
+    if (amount >= 1000) {
+      return `$${(amount / 1000).toFixed(0)}K`;
+    }
+    return `$${amount.toLocaleString()}`;
+  };
 
   return (
     <div className="grid gap-5 lg:gap-7.5">
@@ -149,95 +187,130 @@ export const DestinationKPStats = () => {
         {/* Revenue Card - Large with Gradient */}
         <div className="lg:col-span-2">
           <div className="group h-full rounded-[32px] bg-gradient-to-br from-indigo-400 via-purple-400 to-pink-400 text-white p-8 lg:p-10 flex flex-col justify-between shadow-xl shadow-indigo-400/10 relative overflow-hidden transition-all hover:shadow-2xl hover:shadow-indigo-400/20">
-            <div className="flex flex-col gap-8 relative z-10 h-full">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-white/15 rounded-2xl backdrop-blur-md border border-white/10 shadow-inner">
-                    <DollarSign className="w-8 h-8" />
+            {revenueLoading ? (
+              // Loading skeleton for revenue card
+              <div className="flex flex-col gap-8 relative z-10 h-full animate-pulse">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 bg-white/20 rounded-2xl" />
+                    <div>
+                      <div className="w-24 h-4 bg-white/20 rounded mb-2" />
+                      <div className="w-32 h-10 bg-white/20 rounded" />
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-white/70 uppercase tracking-wider">
-                      Total Revenue
-                    </p>
-                    <h3 className="text-4xl lg:text-5xl font-bold tracking-tight mt-1 text-white">
-                      $125K
-                    </h3>
+                  <div className="w-16 h-6 bg-white/20 rounded-full" />
+                </div>
+                <div className="flex-1 w-full min-h-[140px] bg-white/10 rounded-xl" />
+                <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/10">
+                  {[0, 1, 2].map((i) => (
+                    <div key={i} className="flex flex-col gap-2">
+                      <div className="w-16 h-3 bg-white/20 rounded" />
+                      <div className="w-12 h-6 bg-white/20 rounded" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-8 relative z-10 h-full">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-white/15 rounded-2xl backdrop-blur-md border border-white/10 shadow-inner">
+                      <DollarSign className="w-8 h-8" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-white/70 uppercase tracking-wider">
+                        {revenueData?.lable || "Total Revenue"}
+                      </p>
+                      <h3 className="text-4xl lg:text-5xl font-bold tracking-tight mt-1 text-white">
+                        {formatAmount(revenueData?.total_amt || 0)}
+                      </h3>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-1">
+                    <TrendBadge
+                      change={`+${revenueData?.growth_percentage || 0}%`}
+                      tone="positive"
+                      className=" text-white border-white/10 backdrop-blur-md px-3 py-1"
+                    />
+                    <p className="text-xs">vs last month</p>
                   </div>
                 </div>
-                <div className="flex flex-col items-end gap-1">
-                  <TrendBadge
-                    change="+12%"
-                    tone="positive"
-                    className=" text-white border-white/10 backdrop-blur-md px-3 py-1"
-                  />
-                  <p className="text-xs">vs last month</p>
-                </div>
-              </div>
 
-              {/* Revenue Chart */}
-              <div className="flex-1 w-full min-h-[140px] -ml-2 relative">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={revenueData}>
-                    <defs>
-                      <linearGradient
-                        id="colorRevenueDKP"
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop offset="5%" stopColor="#fff" stopOpacity={0.35} />
-                        <stop offset="95%" stopColor="#fff" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "rgba(255, 255, 255, 0.95)",
-                        borderRadius: "16px",
-                        border: "none",
-                        color: "#818cf8",
-                        boxShadow: "0 10px 30px -10px rgba(0,0,0,0.2)",
-                      }}
-                      itemStyle={{ color: "#818cf8", fontWeight: 600 }}
-                      cursor={{
-                        stroke: "rgba(255,255,255,0.3)",
-                        strokeWidth: 1,
-                        strokeDasharray: "5 5",
-                      }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="value"
-                      stroke="#fff"
-                      strokeWidth={3}
-                      fillOpacity={1}
-                      fill="url(#colorRevenueDKP)"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
+                {/* Revenue Chart */}
+                <div className="flex-1 w-full min-h-[140px] -ml-2 relative">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={chartData}>
+                      <defs>
+                        <linearGradient
+                          id="colorRevenueDKP"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="5%"
+                            stopColor="#fff"
+                            stopOpacity={0.35}
+                          />
+                          <stop offset="95%" stopColor="#fff" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "rgba(255, 255, 255, 0.95)",
+                          borderRadius: "16px",
+                          border: "none",
+                          color: "#818cf8",
+                          boxShadow: "0 10px 30px -10px rgba(0,0,0,0.2)",
+                        }}
+                        itemStyle={{ color: "#818cf8", fontWeight: 600 }}
+                        cursor={{
+                          stroke: "rgba(255,255,255,0.3)",
+                          strokeWidth: 1,
+                          strokeDasharray: "5 5",
+                        }}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="value"
+                        stroke="#fff"
+                        strokeWidth={3}
+                        fillOpacity={1}
+                        fill="url(#colorRevenueDKP)"
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
 
-              <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/10">
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">
-                    Tourism
-                  </span>
-                  <span className="text-xl font-bold text-white">$75K</span>
-                </div>
-                <div className="flex flex-col gap-1 border-l border-white/10 pl-6">
-                  <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">
-                    Events
-                  </span>
-                  <span className="text-xl font-bold text-white">$35K</span>
-                </div>
-                <div className="flex flex-col gap-1 border-l border-white/10 pl-6">
-                  <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">
-                    Facilities
-                  </span>
-                  <span className="text-xl font-bold text-white">$15K</span>
+                <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/10">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">
+                      Tourism
+                    </span>
+                    <span className="text-xl font-bold text-white">
+                      {formatAmount(revenueData?.tourism || 0)}
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-1 border-l border-white/10 pl-6">
+                    <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">
+                      Events
+                    </span>
+                    <span className="text-xl font-bold text-white">
+                      {formatAmount(revenueData?.events || 0)}
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-1 border-l border-white/10 pl-6">
+                    <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">
+                      Facilities
+                    </span>
+                    <span className="text-xl font-bold text-white">
+                      {formatAmount(revenueData?.facilities || 0)}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Decorative background elements */}
             <div className="absolute -right-20 -top-20 w-80 h-80 bg-white/10 rounded-full blur-[80px] pointer-events-none mix-blend-overlay"></div>
