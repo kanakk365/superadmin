@@ -153,7 +153,7 @@ export const DestinationKPStats = () => {
                 />
                 <StatCard
                   value="--"
-                  label="Contact Req"
+                  label="Contact Requests"
                   icon={<Building2 className="w-5 h-5" />}
                   change="0%"
                   delay={200}
