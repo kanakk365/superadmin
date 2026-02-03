@@ -9,8 +9,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Loader2, Calendar, Trophy } from "lucide-react";
+import {
+  getYSNOrganizerMatches,
+  type Match,
+  type MatchesData,
+} from "@/lib/api/ysn-organizer";
 
-const upcomingMatches = [
+// Fallback mock data
+const fallbackUpcomingMatches = [
   {
     match: "Rockets vs Comets",
     league: "Super Cup",
@@ -37,7 +44,7 @@ const upcomingMatches = [
   },
 ];
 
-const recentMatches = [
+const fallbackRecentMatches = [
   {
     match: "Tigers vs Lions",
     league: "Premier League",
@@ -66,13 +73,76 @@ const recentMatches = [
 
 export const MatchesTable = () => {
   const [matchType, setMatchType] = React.useState<"upcoming" | "recent">(
-    "upcoming"
+    "upcoming",
   );
+  const [matchesData, setMatchesData] = React.useState<MatchesData | null>(
+    null,
+  );
+  const [loading, setLoading] = React.useState(true);
+  const [hasData, setHasData] = React.useState(false);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const response = await getYSNOrganizerMatches();
+        if (response.status && response.data) {
+          setMatchesData(response.data);
+          // Check if there's any actual data
+          const hasRecents =
+            response.data.recents && response.data.recents.length > 0;
+          const hasUpcoming =
+            response.data.upcoming && response.data.upcoming.length > 0;
+          setHasData(hasRecents || hasUpcoming);
+        }
+      } catch (error) {
+        console.error("Failed to fetch matches data:", error);
+        setHasData(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Get current matches based on type
+  const getCurrentMatches = () => {
+    if (!hasData || !matchesData) {
+      return matchType === "upcoming"
+        ? fallbackUpcomingMatches
+        : fallbackRecentMatches;
+    }
+
+    const data =
+      matchType === "upcoming" ? matchesData.upcoming : matchesData.recents;
+    if (!data || data.length === 0) {
+      return matchType === "upcoming"
+        ? fallbackUpcomingMatches
+        : fallbackRecentMatches;
+    }
+
+    return data;
+  };
+
+  const currentMatches = getCurrentMatches();
 
   return (
-    <div className="rounded-3xl bg-card py-6 px-3">
+    <div className="rounded-3xl bg-card py-6 px-3 border border-border/40 shadow-sm">
       <div className="flex items-center justify-between px-6 mb-4">
-        <h3 className="text-lg font-semibold text-foreground">Matches</h3>
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-purple-500/10">
+            <Trophy className="w-5 h-5 text-purple-500" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-foreground">Matches</h3>
+            <p className="text-xs text-muted-foreground">
+              {hasData
+                ? "Live data from API"
+                : "Sample data - API returned empty"}
+            </p>
+          </div>
+        </div>
         <Select
           value={matchType}
           onValueChange={(value) =>
@@ -92,8 +162,23 @@ export const MatchesTable = () => {
           </SelectContent>
         </Select>
       </div>
+
       <div className="overflow-hidden">
-        {matchType === "upcoming" ? (
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+          </div>
+        ) : currentMatches.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+            <Calendar className="w-12 h-12 mb-4 opacity-50" />
+            <p className="text-lg font-medium">No matches available</p>
+            <p className="text-sm">
+              {matchType === "upcoming"
+                ? "Upcoming matches will appear here"
+                : "Recent matches will appear here"}
+            </p>
+          </div>
+        ) : matchType === "upcoming" ? (
           <table className="w-full table-fixed border-collapse text-sm">
             <thead className="border-b border-border text-left text-sm font-thin text-muted-foreground">
               <tr>
@@ -104,13 +189,13 @@ export const MatchesTable = () => {
               </tr>
             </thead>
             <tbody className="text-sm text-foreground">
-              {upcomingMatches.map((item) => (
+              {currentMatches.map((item: any, index: number) => (
                 <tr
-                  key={item.match}
-                  className="border-b border-border/60 last:border-0"
+                  key={item.match || item.id || index}
+                  className="border-b border-border/60 last:border-0 hover:bg-muted/30 transition-colors"
                 >
-                  <td className="px-6 py-3 text-sm font-normal text-foreground">
-                    {item.match}
+                  <td className="px-6 py-3 text-sm font-medium text-foreground">
+                    {item.match || `${item.team1} vs ${item.team2}`}
                   </td>
                   <td className="px-6 py-3 text-sm font-normal text-foreground">
                     {item.league}
@@ -138,13 +223,13 @@ export const MatchesTable = () => {
               </tr>
             </thead>
             <tbody className="text-sm text-foreground">
-              {recentMatches.map((item) => (
+              {currentMatches.map((item: any, index: number) => (
                 <tr
-                  key={item.match}
-                  className="border-b border-border/60 last:border-0"
+                  key={item.match || item.id || index}
+                  className="border-b border-border/60 last:border-0 hover:bg-muted/30 transition-colors"
                 >
-                  <td className="px-6 py-3 text-sm font-normal text-foreground">
-                    {item.match}
+                  <td className="px-6 py-3 text-sm font-medium text-foreground">
+                    {item.match || `${item.team1} vs ${item.team2}`}
                   </td>
                   <td className="px-6 py-3 text-sm font-normal text-foreground">
                     {item.league}
@@ -153,7 +238,16 @@ export const MatchesTable = () => {
                     {item.viewers}
                   </td>
                   <td className="px-6 py-3 text-sm font-normal text-foreground">
-                    {item.result}
+                    <span
+                      className={cn(
+                        "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
+                        item.result === "Pending"
+                          ? "bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-300"
+                          : "bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300",
+                      )}
+                    >
+                      {item.result}
+                    </span>
                   </td>
                 </tr>
               ))}
