@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
   Users,
@@ -21,6 +21,22 @@ import {
   Filter,
   Download,
 } from "lucide-react";
+import {
+  getYSNAdminCount,
+  YSNAdminCountStat,
+  getYSNAdminRevenueSources,
+  RevenueSource,
+  getYSNAdminTotalRevenueTrends,
+  RevenueTrendsData,
+  getYSNAdminStreamingPerformance,
+  StreamingPerfData,
+  getYSNAdminRecentStreamedEvents,
+  StreamedEvent,
+  getYSNAdminNewUserAcquisition,
+  NewUserAcquisitionData,
+  getYSNAdminTopAdvertiserRevenue,
+  AdvertiserRevenue,
+} from "@/lib/api/ysn-admin";
 import {
   Card,
   CardContent,
@@ -257,6 +273,157 @@ export const YSNAdmin = () => {
   );
   const [revenueFilter, setRevenueFilter] = useState("all");
 
+  const [stats, setStats] = useState<YSNAdminCountStat[]>([]);
+  const [revenueSources, setRevenueSources] = useState<RevenueSource[]>([]);
+  const [revenueTrends, setRevenueTrends] = useState<RevenueTrendsData | null>(
+    null,
+  );
+  const [streamingPerf, setStreamingPerf] = useState<StreamingPerfData | null>(
+    null,
+  );
+  const [recentEvents, setRecentEvents] = useState<StreamedEvent[]>([]);
+  const [newUserMsg, setNewUserMsg] = useState<NewUserAcquisitionData | null>(
+    null,
+  );
+  const [topAdvertisers, setTopAdvertisers] = useState<AdvertiserRevenue[]>([]);
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [
+          statsRes,
+          sourcesRes,
+          trendsRes,
+          streamingRes,
+          eventsRes,
+          usersRes,
+          adsRes,
+        ] = await Promise.all([
+          getYSNAdminCount(),
+          getYSNAdminRevenueSources(),
+          getYSNAdminTotalRevenueTrends(),
+          getYSNAdminStreamingPerformance(),
+          getYSNAdminRecentStreamedEvents(),
+          getYSNAdminNewUserAcquisition(),
+          getYSNAdminTopAdvertiserRevenue(),
+        ]);
+
+        if (statsRes.status && statsRes.data) setStats(statsRes.data);
+        if (sourcesRes.status && sourcesRes.data)
+          setRevenueSources(sourcesRes.data);
+        if (trendsRes.status && trendsRes.data)
+          setRevenueTrends(trendsRes.data);
+        if (streamingRes.status && streamingRes.data)
+          setStreamingPerf(streamingRes.data);
+        if (eventsRes.status && eventsRes.data) setRecentEvents(eventsRes.data);
+        if (usersRes.status && usersRes.data) setNewUserMsg(usersRes.data);
+        if (adsRes.status && adsRes.data) setTopAdvertisers(adsRes.data);
+      } catch (e) {
+        console.error("Failed to fetch YSN admin data", e);
+      } finally {
+        setLoading(false);
+      }
+      return;
+    };
+    fetchData();
+  }, []);
+
+  const formatCount = (num: number, isCurrency: boolean = false) => {
+    if (num >= 1000000)
+      return (isCurrency ? "$" : "") + (num / 1000000).toFixed(1) + "M";
+    if (num >= 1000)
+      return (isCurrency ? "$" : "") + (num / 1000).toFixed(1) + "K";
+    return (isCurrency ? "$" : "") + num.toLocaleString();
+  };
+
+  const getStatConfig = (label: string) => {
+    if (label.includes("Revenue"))
+      return {
+        icon: <DollarSign className="w-6 h-6 text-white" />,
+        bg: "bg-gradient-to-br from-pink-500 to-purple-600",
+        tone: "positive",
+        highlight: true,
+      };
+    if (label.includes("Organizations"))
+      return {
+        icon: <Building2 className="w-6 h-6 text-purple-500" />,
+        bg: "bg-purple-500/10",
+        tone: "positive",
+      };
+    if (label.includes("Teams"))
+      return {
+        icon: <Shield className="w-6 h-6 text-indigo-500" />,
+        bg: "bg-indigo-500/10",
+        tone: "positive",
+      };
+    if (label.includes("Users"))
+      return {
+        icon: <Users className="w-6 h-6 text-fuchsia-500" />,
+        bg: "bg-fuchsia-500/10",
+        tone: "positive",
+      };
+    if (label.includes("Streamed"))
+      return {
+        icon: <Video className="w-6 h-6 text-pink-500" />,
+        bg: "bg-pink-500/10",
+        tone: "positive",
+      };
+    return {
+      icon: <Activity className="w-6 h-6 text-gray-500" />,
+      bg: "bg-gray-100",
+      tone: "positive",
+    };
+  };
+
+  const getChartDataRaw = (data: any[], valueKey: string = "value") => {
+    return data.map((item) => {
+      // Handle the "Sun": "Fri" case from prompt by checking keys strictly
+      let label = item.label;
+      if (!label && typeof item === "object") {
+        // Find a specific day key if label is missing
+        const dayKeys = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        const foundKey = Object.keys(item).find(
+          (k) => dayKeys.includes(k) && typeof item[k] === "string",
+        );
+        if (foundKey) label = item[foundKey] as string;
+      }
+
+      return {
+        name: label || "",
+        value: item[valueKey],
+      };
+    });
+  };
+
+  const getRevenueChartData = () => {
+    if (!revenueTrends) return [];
+    const keyMap: Record<string, keyof RevenueTrendsData> = {
+      all: "platform_total",
+      org: "by_organization",
+      team: "by_team",
+    };
+    const dataKey = keyMap[revenueFilter] || "platform_total";
+    const timeData = revenueTrends[dataKey]?.[timeRange] || [];
+    return getChartDataRaw(timeData, "value");
+  };
+
+  const revenueChartData = getRevenueChartData();
+
+  const getStreamingChartData = () => {
+    if (!streamingPerf) return [];
+    return getChartDataRaw(streamingPerf[timeRange] || [], "value");
+  };
+  const streamingChartData = getStreamingChartData();
+
+  const getNewUserChartData = () => {
+    if (!newUserMsg) return [];
+    return getChartDataRaw(newUserMsg[timeRange] || [], "total");
+  };
+  const newUserChartData = getNewUserChartData();
+
   return (
     <ScrollArea className="h-full w-full bg-gradient-to-b from-muted/20 to-background">
       <div className="flex flex-col gap-8 px-4 sm:px-8 py-8 max-w-[1600px] mx-auto pb-20">
@@ -274,47 +441,36 @@ export const YSNAdmin = () => {
 
         {/* Top Level Metrics */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
-          <StatCard
-            value="$1.2M"
-            label="Total Platform Revenue"
-            change="+18.2%"
-            icon={<DollarSign className="w-6 h-6 text-white" />}
-            highlight
-            tone="positive"
-            bg="bg-gradient-to-br from-pink-500 to-purple-600"
-          />
-          <StatCard
-            value="845"
-            label="Total Organizations"
-            change="+12"
-            icon={<Building2 className="w-6 h-6 text-purple-500" />}
-            bg="bg-purple-500/10"
-            tone="positive"
-          />
-          <StatCard
-            value="3,420"
-            label="Total Teams"
-            change="+56"
-            icon={<Shield className="w-6 h-6 text-indigo-500" />}
-            bg="bg-indigo-500/10"
-            tone="positive"
-          />
-          <StatCard
-            value="152.4K"
-            label="Total Users"
-            change="+5.4%"
-            icon={<Users className="w-6 h-6 text-fuchsia-500" />}
-            bg="bg-fuchsia-500/10"
-            tone="positive"
-          />
-          <StatCard
-            value="24.5K"
-            label="Events Streamed"
-            change="+8.1%"
-            icon={<Video className="w-6 h-6 text-pink-500" />}
-            bg="bg-pink-500/10"
-            tone="positive"
-          />
+          {loading
+            ? // Simple Skeleton
+              Array(5)
+                .fill(0)
+                .map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-32 rounded-[28px] bg-muted/20 animate-pulse"
+                  />
+                ))
+            : stats.map((stat, i) => {
+                const config = getStatConfig(stat.label);
+                return (
+                  <StatCard
+                    key={i}
+                    value={formatCount(
+                      stat.count,
+                      stat.label.includes("Revenue"),
+                    )}
+                    label={stat.label}
+                    change={
+                      stat.badge_count > 0 ? `+${stat.badge_count}%` : "0%"
+                    }
+                    icon={config.icon}
+                    highlight={config.highlight}
+                    tone={config.tone as "positive" | "negative"}
+                    bg={config.bg}
+                  />
+                );
+              })}
         </div>
 
         {/* Revenue Breakdown Section */}
@@ -361,7 +517,7 @@ export const YSNAdmin = () => {
             <CardContent>
               <div className="h-[300px] w-full mt-4">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={revenueData[timeRange]}>
+                  <AreaChart data={revenueChartData}>
                     <defs>
                       <linearGradient
                         id="colorRevenue"
@@ -439,11 +595,10 @@ export const YSNAdmin = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
-                      data={[
-                        { name: "Organizers", value: 65 },
-                        { name: "Advertisers", value: 25 },
-                        { name: "Subscriptions", value: 10 },
-                      ]}
+                      data={revenueSources.map((s) => ({
+                        name: s.label,
+                        value: s.value,
+                      }))}
                       cx="50%"
                       cy="50%"
                       innerRadius={60}
@@ -468,18 +623,14 @@ export const YSNAdmin = () => {
                 </div>
               </div>
               <div className="flex flex-wrap justify-center gap-4 mt-4">
-                {[
-                  { name: "Organizers", value: 65, color: COLORS[0] },
-                  { name: "Advertisers", value: 25, color: COLORS[1] },
-                  { name: "Subscriptions", value: 10, color: COLORS[2] },
-                ].map((item) => (
-                  <div key={item.name} className="flex items-center gap-2">
+                {revenueSources.map((item, index) => (
+                  <div key={item.label} className="flex items-center gap-2">
                     <div
                       className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: item.color }}
+                      style={{ backgroundColor: COLORS[index % COLORS.length] }}
                     />
                     <span className="text-sm text-muted-foreground">
-                      {item.name} ({item.value}%)
+                      {item.label} ({item.value}%)
                     </span>
                   </div>
                 ))}
@@ -503,7 +654,7 @@ export const YSNAdmin = () => {
             <CardContent>
               <div className="h-[300px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={streamingStats.minutesViewed[timeRange]}>
+                  <BarChart data={streamingChartData}>
                     <CartesianGrid
                       strokeDasharray="3 3"
                       vertical={false}
@@ -534,7 +685,7 @@ export const YSNAdmin = () => {
                     />
                     <Bar
                       dataKey="value"
-                      name="Viewed Minutes"
+                      name="Streaming Performance"
                       fill="#8b5cf6"
                       radius={[4, 4, 0, 0]}
                     />
@@ -555,7 +706,7 @@ export const YSNAdmin = () => {
             <CardContent>
               <div className="h-[300px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={newUsersData[timeRange]}>
+                  <AreaChart data={newUserChartData}>
                     <defs>
                       <linearGradient
                         id="colorUsers"
@@ -654,18 +805,15 @@ export const YSNAdmin = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/40">
-                {streamedEvents.map((event) => (
-                  <tr
-                    key={event.id}
-                    className="hover:bg-muted/20 transition-colors"
-                  >
+                {recentEvents.map((event, i) => (
+                  <tr key={i} className="hover:bg-muted/20 transition-colors">
                     <td className="px-6 py-4 font-medium text-foreground">
                       {event.date}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
                         <span className="font-semibold text-foreground">
-                          {event.org}
+                          {event.organization}
                         </span>
                         <span className="text-xs text-muted-foreground">
                           {event.team}
@@ -693,15 +841,15 @@ export const YSNAdmin = () => {
                     <td className="px-6 py-4 text-right">
                       <div className="flex flex-col items-end">
                         <span className="font-medium text-foreground">
-                          {event.minutesViewed} viewed
+                          {(event.minutes.viewed / 1000).toFixed(1)}K viewed
                         </span>
                         <span className="text-xs text-muted-foreground">
-                          {event.minutesStreamed} streamed
+                          {event.minutes.streamed} streamed
                         </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 text-right font-bold text-fuchsia-500">
-                      {event.revenue}
+                      ${event.revenue.toLocaleString()}
                     </td>
                   </tr>
                 ))}
@@ -721,9 +869,9 @@ export const YSNAdmin = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {advertiserRevenue.map((ad, i) => (
+                {topAdvertisers.map((ad, i) => (
                   <div
-                    key={ad.name}
+                    key={ad.advertiser}
                     className="flex items-center justify-between p-3 rounded-2xl bg-muted/30 border border-transparent hover:border-border/50 hover:bg-muted/50 transition-all"
                   >
                     <div className="flex items-center gap-3">
@@ -732,15 +880,15 @@ export const YSNAdmin = () => {
                       </span>
                       <div className="flex flex-col">
                         <span className="font-semibold text-foreground">
-                          {ad.name}
+                          {ad.advertiser}
                         </span>
                         <span className="text-xs text-muted-foreground">
-                          {ad.campaigns} Active Campaigns
+                          {ad.active_campaigns} Active Campaigns
                         </span>
                       </div>
                     </div>
                     <span className="font-bold text-pink-500">
-                      ${ad.value.toLocaleString()}
+                      ${ad.revenue.toLocaleString()}
                     </span>
                   </div>
                 ))}

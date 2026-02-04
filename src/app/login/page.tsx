@@ -44,7 +44,7 @@ export default function LoginPage() {
       const response = await loginUser(email, password);
 
       if (response.status) {
-        const role = getUserRole(response.data.id);
+        const role = getUserRole(response.data.user_type);
 
         setUser({
           ...response.data,

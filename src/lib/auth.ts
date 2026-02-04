@@ -1,4 +1,3 @@
-// Authentication utilities and API calls
 import { useAuthStore, AuthUser } from "@/store/auth-store";
 
 export interface LoginResponse {
@@ -8,15 +7,14 @@ export interface LoginResponse {
     id: number;
     name: string;
     email: string;
+    user_type: number;
   };
   message: string;
 }
 
 export type User = AuthUser;
 
-// API base URL - update this with your actual API URL
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://api.example.com";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function loginUser(
   email: string,
@@ -37,14 +35,14 @@ export async function loginUser(
   return response.json();
 }
 
-export function getUserRole(id: number): "admin" | "organizer" {
-  if (id === 4) return "admin";
-  if (id === 2) return "organizer";
-  return "organizer"; // Default to organizer for other IDs
+export function getUserRole(user_type: number): "admin" | "organizer" {
+  if (user_type === 0) return "admin";
+  if (user_type === 1) return "organizer";
+  return "organizer";
 }
 
 export function saveAuthData(data: LoginResponse["data"]): void {
-  const role = getUserRole(data.id);
+  const role = getUserRole(data.user_type);
   const user: AuthUser = {
     ...data,
     role,
