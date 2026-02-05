@@ -47,6 +47,27 @@ import {
 } from "recharts";
 import { TrendBadge } from "../dashboard/TrendBadge";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import {
+  getYSNAdminCount,
+  getYSNAdminTotalRevenueTrends,
+  getYSNAdminNewUserAcquisition,
+} from "@/lib/api/ysn-admin";
+import {
+  getYSNOrganizerCount,
+  getYSNOrganizerTotalRevenue,
+  getYSNOrganizerNewUserGrowth,
+} from "@/lib/api/ysn-organizer";
+import {
+  getAdminCount,
+  getUserGrowth,
+  getTournamentOverview,
+  getRecentTournaments,
+} from "@/lib/api/battle-lounge/admin";
+import {
+  getOrganizerStats,
+  getOrganizerUsers,
+} from "@/lib/api/battle-lounge/organizer";
 
 // --- Mock Data ---
 
@@ -218,7 +239,7 @@ const projects = [
   },
 ];
 
-const overallStats = [
+const initialOverallStats = [
   {
     title: "Total Revenue",
     value: "$201.2K",
@@ -259,9 +280,190 @@ const overallStats = [
 
 import { useAuthStore } from "@/store/auth-store";
 
+// Helper to format numbers (e.g., 12500 -> 12.5K)
+const formatNumber = (num: number) => {
+  if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
+  if (num >= 1000) return (num / 1000).toFixed(1) + "K";
+  return num.toString();
+};
+
+const formatCurrency = (num: number) => {
+  if (num >= 1000000) return "$" + (num / 1000000).toFixed(1) + "M";
+  if (num >= 1000) return "$" + (num / 1000).toFixed(1) + "K";
+  return "$" + num.toLocaleString();
+};
+
+const parseCurrency = (str: string) => {
+  const multiplier = str.includes("M") ? 1000000 : str.includes("K") ? 1000 : 1;
+  const num = parseFloat(str.replace(/[^0-9.]/g, ""));
+  return num * multiplier;
+};
+
+const parseNumber = (str: string) => {
+  const multiplier = str.includes("M") ? 1000000 : str.includes("K") ? 1000 : 1;
+  const num = parseFloat(str.replace(/[^0-9.]/g, ""));
+  return num * multiplier;
+};
+
 export const OverallDashboard = () => {
   const { user } = useAuthStore();
   const role = user?.role || "organizer";
+
+  const [projectData, setProjectData] = useState(projects);
+  const [statsData, setStatsData] = useState(initialOverallStats);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        let ysnData: any = {};
+        let blData: any = {};
+
+        // --- Fetch YSN Data ---
+        if (role === "admin") {
+          const [countRes, revenueTrendRes, usersAcqRes] = await Promise.all([
+            getYSNAdminCount(),
+            getYSNAdminTotalRevenueTrends(),
+            getYSNAdminNewUserAcquisition(),
+          ]);
+          
+          const count = countRes.data;
+          const revenueTrend = revenueTrendRes.data;
+          
+          const totalUsers = count.find((c: any) => c.label.toLowerCase().includes("users"))?.count || 0;
+          const totalRevenue = revenueTrend.platform_total.year.reduce((acc: number, curr: any) => acc + curr.value, 0); // Approx sum
+          
+          ysnData = {
+            users: formatNumber(Number(totalUsers)),
+            revenue: formatCurrency(totalRevenue),
+            // We can add more specific mappings here for stats.primaryMetrics
+             primaryMetrics: [
+              { label: "Total Users", value: formatNumber(Number(totalUsers)), icon: Users, highlight: true },
+             ]
+          };
+
+        } else {
+          // Organizer
+          const [countRes, revenueRes, usersRes] = await Promise.all([
+             getYSNOrganizerCount(),
+             getYSNOrganizerTotalRevenue(),
+             getYSNOrganizerNewUserGrowth(),
+          ]);
+
+          const count = countRes.data;
+          const revenue = revenueRes.data;
+
+          const totalUsers = count.find((c: any) => c.label.toLowerCase().includes("users") || c.label.toLowerCase().includes("players"))?.count || 0;
+          const totalRevenue = revenue.growth_count || 0; 
+          
+          ysnData = {
+             users: formatNumber(Number(totalUsers)),
+             revenue: formatCurrency(totalRevenue),
+          };
+        }
+
+
+        // --- Fetch Battle Lounge Data ---
+        if (role === "admin") {
+            const [countRes, growthRes, overviewRes] = await Promise.all([
+                getAdminCount(),
+                getUserGrowth(),
+                getTournamentOverview()
+            ]);
+            
+            const count = countRes.data;
+            const overview = overviewRes.data;
+
+            const totalUsers = count.find((c: any) => c.label.toLowerCase().includes("user"))?.count || 0;
+            // Revenue might not be directly available for BL Admin, let's look for a suitable metric or keep default
+            const totalRevenue = 0; // Placeholder if no API
+            
+            blData = {
+                users: formatNumber(Number(totalUsers)),
+                // revenue: formatCurrency(totalRevenue), // Keep default if 0
+                primaryMetrics: [
+                     { label: "Tournaments", value: overview.total.toString(), icon: Trophy, highlight: true },
+                     { label: "Active Users", value: formatNumber(Number(totalUsers)), icon: Users },
+                ]
+            };
+
+        } else {
+            // Organizer
+            const [statsRes, usersRes] = await Promise.all([
+                getOrganizerStats(),
+                getOrganizerUsers()
+            ]);
+
+            const stats = statsRes.data;
+            const users = usersRes.data;
+
+            const totalUsers = users.totalActiveUsers.count || 0;
+            const totalRevenue = 0; // Placeholder
+
+            blData = {
+                 users: formatNumber(totalUsers),
+                 primaryMetrics: [
+                     { label: "Tournaments", value: stats.total.toString(), icon: Trophy, highlight: true },
+                     { label: "Upcoming", value: stats.upcomming.toString(), icon: Calendar },
+                     { label: "Active Users", value: formatNumber(totalUsers), icon: Users },
+                 ]
+            }
+        }
+        // --- Update Projects State ---
+        const updatedProjects = projects.map((p) => {
+          if (p.id === "ysn") {
+            return {
+              ...p,
+              users: ysnData.users || p.users,
+              revenue: ysnData.revenue || p.revenue,
+              stats: {
+                ...p.stats,
+                primaryMetrics:
+                  ysnData.primaryMetrics || p.stats.primaryMetrics,
+              },
+            };
+          }
+          if (p.id === "battle-lounge") {
+            return {
+              ...p,
+              users: blData.users || p.users,
+              revenue: blData.revenue || p.revenue, // Only update if we have real data
+              stats: {
+                ...p.stats,
+                primaryMetrics: blData.primaryMetrics || p.stats.primaryMetrics,
+              },
+            };
+          }
+          return p;
+        });
+
+        setProjectData(updatedProjects);
+
+        // --- Recalculate Overall Stats ---
+        const totalRev = updatedProjects.reduce(
+          (acc, curr) => acc + parseCurrency(curr.revenue),
+          0,
+        );
+        const totalUsr = updatedProjects.reduce(
+          (acc, curr) => acc + parseNumber(curr.users),
+          0,
+        );
+
+        setStatsData((prev) =>
+          prev.map((s) => {
+            if (s.title === "Total Revenue")
+              return { ...s, value: formatCurrency(totalRev) };
+            if (s.title === "Total Users")
+              return { ...s, value: formatNumber(totalUsr) };
+            return s;
+          }),
+        );
+      } catch (error) {
+        console.error("Failed to fetch dashboard data", error);
+      }
+    };
+
+    fetchDashboardData();
+  }, [role]);
 
   // Helper to get dynamic href based on role
   const getProjectHref = (projectId: string, defaultHref: string) => {
@@ -287,7 +489,7 @@ export const OverallDashboard = () => {
 
         {/* Top Aggregated Stats */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {overallStats.map((stat, index) => (
+          {statsData.map((stat, index) => (
             <div
               key={index}
               className={cn(
@@ -365,7 +567,7 @@ export const OverallDashboard = () => {
           </div>
           {/* Full-width cards for each project */}
           <div className="flex flex-col gap-6">
-            {projects.map((project, index) => (
+            {projectData.map((project, index) => (
               <EnhancedProjectCard
                 key={index}
                 project={{
