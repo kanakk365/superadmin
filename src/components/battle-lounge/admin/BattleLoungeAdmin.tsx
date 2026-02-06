@@ -59,6 +59,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   getAdminCount,
   getUserGrowth,
   getTournamentOverview,
@@ -90,6 +96,7 @@ export const BattleLoungeAdmin = () => {
     RecentTournament[]
   >([]);
   const [liveStreams, setLiveStreams] = useState<LiveTwitchStream[]>([]);
+  const [isTournamentModalOpen, setIsTournamentModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -198,6 +205,117 @@ export const BattleLoungeAdmin = () => {
 
   const chartData = getChartData();
   const tournamentStatsData = getTournamentStatsData();
+
+  const renderTournamentTable = (tournaments: RecentTournament[]) => (
+    <div className="overflow-x-auto">
+      {tournaments.length > 0 ? (
+        <table className="w-full text-sm text-left">
+          <thead className="bg-muted/30 text-muted-foreground uppercase text-xs">
+            <tr>
+              <th className="px-6 py-4 font-semibold">Tournament</th>
+              <th className="px-6 py-4 font-semibold">Status</th>
+              <th className="px-6 py-4 font-semibold">Players</th>
+              <th className="px-6 py-4 font-semibold">Prize</th>
+              <th className="px-6 py-4 font-semibold">Issues</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border/40">
+            {tournaments.map((t) => (
+              <tr
+                key={t.id}
+                className="hover:bg-muted/20 transition-colors"
+              >
+                <td className="px-6 py-4">
+                  <div className="flex flex-col">
+                    <span className="font-semibold text-foreground text-base">
+                      {t.name}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      ID: {t.id}
+                    </span>
+                  </div>
+                </td>
+                <td className="px-6 py-4">
+                  <span
+                    className={cn(
+                      "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border backdrop-blur-sm",
+                      t.status === "Live"
+                        ? "bg-fuchsia-500/10 text-fuchsia-500 border-fuchsia-500/20"
+                        : t.status === "Completed"
+                          ? "bg-muted text-muted-foreground border-border"
+                          : "bg-purple-500/10 text-purple-500 border-purple-500/20",
+                    )}
+                  >
+                    {t.status === "Live" && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-fuchsia-500 mr-1.5 animate-pulse" />
+                    )}
+                    {t.status}
+                  </span>
+                </td>
+                <td className="px-6 py-4">
+                  <div className="flex flex-col gap-1">
+                    <span className="font-bold text-foreground">
+                      {t.no_of_players} Players
+                    </span>
+                    <div className="flex gap-2 text-[10px] uppercase font-bold tracking-wider text-muted-foreground">
+                      <span
+                        title="New"
+                        className="text-purple-500 hover:bg-purple-500/10 px-1 rounded transition-colors"
+                      >
+                        N: {t.new}
+                      </span>
+                      <span
+                        title="Ranked"
+                        className="text-fuchsia-500 hover:bg-fuchsia-500/10 px-1 rounded transition-colors"
+                      >
+                        R: {t.ranked}
+                      </span>
+                      <span
+                        title="Unranked"
+                        className="text-pink-500/70 hover:bg-pink-500/10 px-1 rounded transition-colors"
+                      >
+                        U: {t.un_ranked}
+                      </span>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-6 py-4">
+                  <span className="font-bold text-fuchsia-500">
+                    {t.prize_amount || "N/A"}
+                  </span>
+                </td>
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-4">
+                    <div
+                      title="Disputes"
+                      className="flex items-center gap-1.5 text-purple-500 font-medium"
+                    >
+                      <AlertCircle className="w-4 h-4" />
+                      <span>{t.disputes}</span>
+                    </div>
+                    <div
+                      title="No Show"
+                      className="flex items-center gap-1.5 text-muted-foreground font-medium"
+                    >
+                      <Eye className="w-4 h-4" />
+                      <span>{t.no_showes}</span>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <div className="flex items-center justify-center py-12 text-muted-foreground">
+          <div className="text-center">
+            <Trophy className="w-12 h-12 mx-auto mb-2 opacity-50" />
+            <p>No recent tournaments found</p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <ScrollArea className="h-full w-full bg-gradient-to-b from-muted/20 to-background">
@@ -442,182 +560,38 @@ export const BattleLoungeAdmin = () => {
             <h2 className="text-xl font-bold tracking-tight">
               Recent Tournaments
             </h2>
-            <Button variant="outline" size="sm" className="rounded-full">
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-full"
+              onClick={() => setIsTournamentModalOpen(true)}
+            >
               View All
             </Button>
           </div>
           <Card className="rounded-[32px] border-border/40 shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
-              {recentTournaments.length > 0 ? (
-                <table className="w-full text-sm text-left">
-                  <thead className="bg-muted/30 text-muted-foreground uppercase text-xs">
-                    <tr>
-                      <th className="px-6 py-4 font-semibold">Tournament</th>
-                      <th className="px-6 py-4 font-semibold">Status</th>
-                      <th className="px-6 py-4 font-semibold">Players</th>
-                      <th className="px-6 py-4 font-semibold">Prize</th>
-                      <th className="px-6 py-4 font-semibold">Issues</th>
-                      <th className="px-6 py-4 font-semibold">
-                        <div className="flex items-center gap-1">
-                          App vs Web
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <Info className="w-4 h-4 cursor-help" />
-                              </TooltipTrigger>
-                              <TooltipContent className="bg-popover text-popover-foreground rounded-xl border border-border shadow-lg">
-                                <p>
-                                  Percentage of scores recorded via Mobile App
-                                  vs Web Dashboard
-                                </p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        </div>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border/40">
-                    {recentTournaments.map((t) => {
-                      const totalScoreSource = t.app + t.web;
-                      const appPercentage =
-                        totalScoreSource > 0
-                          ? (t.app / totalScoreSource) * 100
-                          : 0;
-                      const webPercentage =
-                        totalScoreSource > 0
-                          ? (t.web / totalScoreSource) * 100
-                          : 0;
-
-                      return (
-                        <tr
-                          key={t.id}
-                          className="hover:bg-muted/20 transition-colors"
-                        >
-                          <td className="px-6 py-4">
-                            <div className="flex flex-col">
-                              <span className="font-semibold text-foreground text-base">
-                                {t.name}
-                              </span>
-                              <span className="text-xs text-muted-foreground">
-                                ID: {t.id}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span
-                              className={cn(
-                                "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border backdrop-blur-sm",
-                                t.status === "Live"
-                                  ? "bg-fuchsia-500/10 text-fuchsia-500 border-fuchsia-500/20"
-                                  : t.status === "Completed"
-                                    ? "bg-muted text-muted-foreground border-border"
-                                    : "bg-purple-500/10 text-purple-500 border-purple-500/20",
-                              )}
-                            >
-                              {t.status === "Live" && (
-                                <span className="w-1.5 h-1.5 rounded-full bg-fuchsia-500 mr-1.5 animate-pulse" />
-                              )}
-                              {t.status}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex flex-col gap-1">
-                              <span className="font-bold text-foreground">
-                                {t.no_of_players} Players
-                              </span>
-                              <div className="flex gap-2 text-[10px] uppercase font-bold tracking-wider text-muted-foreground">
-                                <span
-                                  title="New"
-                                  className="text-purple-500 hover:bg-purple-500/10 px-1 rounded transition-colors"
-                                >
-                                  N: {t.new}
-                                </span>
-                                <span
-                                  title="Ranked"
-                                  className="text-fuchsia-500 hover:bg-fuchsia-500/10 px-1 rounded transition-colors"
-                                >
-                                  R: {t.ranked}
-                                </span>
-                                <span
-                                  title="Unranked"
-                                  className="text-pink-500/70 hover:bg-pink-500/10 px-1 rounded transition-colors"
-                                >
-                                  U: {t.un_ranked}
-                                </span>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className="font-bold text-fuchsia-500">
-                              {t.prize_amount || "N/A"}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-4">
-                              <div
-                                title="Disputes"
-                                className="flex items-center gap-1.5 text-purple-500 font-medium"
-                              >
-                                <AlertCircle className="w-4 h-4" />
-                                <span>{t.disputes}</span>
-                              </div>
-                              <div
-                                title="No Show"
-                                className="flex items-center gap-1.5 text-muted-foreground font-medium"
-                              >
-                                <Eye className="w-4 h-4" />
-                                <span>{t.no_showes}</span>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            {totalScoreSource > 0 ? (
-                              <>
-                                <div className="w-32 h-2.5 bg-muted rounded-full overflow-hidden flex shadow-inner">
-                                  <div
-                                    className="h-full bg-purple-500"
-                                    style={{ width: `${appPercentage}%` }}
-                                  />
-                                  <div
-                                    className="h-full bg-fuchsia-500"
-                                    style={{ width: `${webPercentage}%` }}
-                                  />
-                                </div>
-                                <div className="flex justify-between text-[10px] font-semibold text-muted-foreground mt-1.5 px-0.5">
-                                  <span className="text-purple-600 dark:text-purple-400">
-                                    App {appPercentage.toFixed(0)}%
-                                  </span>
-                                  <span className="text-fuchsia-600 dark:text-fuchsia-400">
-                                    Web {webPercentage.toFixed(0)}%
-                                  </span>
-                                </div>
-                              </>
-                            ) : (
-                              <span className="text-xs text-muted-foreground">
-                                N/A
-                              </span>
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              ) : (
-                <div className="flex items-center justify-center py-12 text-muted-foreground">
-                  <div className="text-center">
-                    <Trophy className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                    <p>No recent tournaments found</p>
-                  </div>
-                </div>
-              )}
-            </div>
+             {renderTournamentTable(recentTournaments.slice(0, 5))}
           </Card>
+          
+          <Dialog
+             open={isTournamentModalOpen}
+             onOpenChange={setIsTournamentModalOpen}
+          >
+             <DialogContent className="max-w-4xl h-[80vh] flex flex-col p-0 overflow-hidden">
+               <DialogHeader className="p-6 pb-4 border-b shrink-0">
+                 <DialogTitle>All Tournaments</DialogTitle>
+               </DialogHeader>
+               <ScrollArea className="flex-1 h-full">
+                  <div className="p-6">
+                    {renderTournamentTable(recentTournaments)}
+                  </div>
+               </ScrollArea>
+             </DialogContent>
+          </Dialog>
         </div>
 
-        {/* Bottom Section: Streams & Org Stats */}
-        <div className="grid gap-6 lg:grid-cols-2">
+        {/* Bottom Section: Streams only now */}
+        <div className="grid gap-6 lg:grid-cols-1">
           {/* Live Streams */}
           <Card className="rounded-[32px] border-border/40 shadow-sm overflow-hidden">
             <CardHeader>
@@ -629,30 +603,32 @@ export const BattleLoungeAdmin = () => {
             <CardContent>
               <div className="space-y-4">
                 {liveStreams.length > 0 ? (
-                  liveStreams.map((stream, index) => (
-                    <div
-                      key={index}
-                      className="group flex items-center justify-between p-3 rounded-2xl bg-muted/30 border border-transparent hover:border-border/50 hover:bg-muted/50 transition-all duration-300"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
-                          <Twitch className="w-6 h-6 text-purple-600" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {liveStreams.map((stream, index) => (
+                      <div
+                        key={index}
+                        className="group flex items-center justify-between p-3 rounded-2xl bg-muted/30 border border-transparent hover:border-border/50 hover:bg-muted/50 transition-all duration-300"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
+                            <Twitch className="w-6 h-6 text-purple-600" />
+                          </div>
+                          <div className="flex flex-col gap-0.5">
+                            <span className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                              {stream.label}
+                            </span>
+                            <span className="text-xs font-medium text-muted-foreground">
+                              {stream.user}
+                            </span>
+                          </div>
                         </div>
-                        <div className="flex flex-col gap-0.5">
-                          <span className="font-semibold text-foreground group-hover:text-primary transition-colors">
-                            {stream.label}
-                          </span>
-                          <span className="text-xs font-medium text-muted-foreground">
-                            {stream.user}
-                          </span>
+                        <div className="flex items-center gap-2 text-fuchsia-500 text-sm font-bold bg-fuchsia-500/10 px-3 py-1 rounded-full">
+                          <div className="w-2 h-2 rounded-full bg-fuchsia-500 animate-pulse" />
+                          {stream.count.toLocaleString()}
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 text-fuchsia-500 text-sm font-bold bg-fuchsia-500/10 px-3 py-1 rounded-full">
-                        <div className="w-2 h-2 rounded-full bg-fuchsia-500 animate-pulse" />
-                        {stream.count.toLocaleString()}
-                      </div>
-                    </div>
-                  ))
+                    ))}
+                  </div>
                 ) : (
                   <div className="flex items-center justify-center py-8 text-muted-foreground">
                     <div className="text-center">
@@ -661,64 +637,6 @@ export const BattleLoungeAdmin = () => {
                     </div>
                   </div>
                 )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Organizer Stats - Keep with dummy data as no API provided */}
-          <Card className="rounded-[32px] border-border/40 shadow-sm overflow-hidden">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-purple-500" />
-                Organizer Ecosystem
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-5 rounded-[24px] bg-purple-500/10 border border-purple-500/20 flex flex-col gap-2 hover:bg-purple-500/15 transition-colors">
-                  <span className="text-sm font-semibold text-purple-600 dark:text-purple-400">
-                    Total Organizers
-                  </span>
-                  <span className="text-3xl font-bold text-foreground tracking-tight">
-                    1,248
-                  </span>
-                  <span className="text-xs font-medium text-purple-600/70 dark:text-purple-400/70">
-                    +56 this month
-                  </span>
-                </div>
-                <div className="p-5 rounded-[24px] bg-pink-500/10 border border-pink-500/20 flex flex-col gap-2 hover:bg-pink-500/15 transition-colors">
-                  <span className="text-sm font-semibold text-pink-600 dark:text-pink-400">
-                    New Organizers
-                  </span>
-                  <span className="text-3xl font-bold text-foreground tracking-tight">
-                    86
-                  </span>
-                  <span className="text-xs font-medium text-pink-600/70 dark:text-pink-400/70">
-                    Last 30 days
-                  </span>
-                </div>
-                <div className="p-5 rounded-[24px] bg-purple-500/10 border border-purple-500/20 flex flex-col gap-2 hover:bg-purple-500/15 transition-colors">
-                  <span className="text-sm font-semibold text-purple-600 dark:text-purple-400">
-                    Advertisers
-                  </span>
-                  <span className="text-3xl font-bold text-foreground tracking-tight">
-                    156
-                  </span>
-                  <span className="text-xs font-medium text-purple-600/70 dark:text-purple-400/70">
-                    Active Campaigns
-                  </span>
-                </div>
-                <div className="p-5 rounded-[24px] bg-fuchsia-500/10 border border-fuchsia-500/20 flex flex-col gap-2 hover:bg-fuchsia-500/15 transition-colors">
-                  <span className="text-sm font-semibold text-fuchsia-600 dark:text-fuchsia-400">
-                    Ad Revenue
-                  </span>
-                  <span className="text-3xl font-bold text-foreground tracking-tight">
-                    $45.2K
-                  </span>
-                  <span className="text-xs font-medium text-fuchsia-600/70 dark:text-fuchsia-400/70">
-                    +12% vs last month
-                  </span>
-                </div>
               </div>
             </CardContent>
           </Card>

@@ -63,11 +63,23 @@ import {
   getUserGrowth,
   getTournamentOverview,
   getRecentTournaments,
+  getLiveTwitchStreams,
 } from "@/lib/api/battle-lounge/admin";
 import {
   getOrganizerStats,
   getOrganizerUsers,
+  getPopularGames,
+  getStatusBasedTournaments,
+  getTournamentStatistics,
 } from "@/lib/api/battle-lounge/organizer";
+import {
+  getDKPCount,
+  getDKPRevenue,
+  getActiveJobs,
+  getUpcomingEvents,
+  getGuestChannel,
+  getEventAttendanceTrends,
+} from "@/lib/api/dkp";
 
 // --- Mock Data ---
 
@@ -317,6 +329,7 @@ export const OverallDashboard = () => {
       try {
         let ysnData: any = {};
         let blData: any = {};
+        let dkpData: any = {};
 
         // --- Fetch YSN Data ---
         if (role === "admin") {
@@ -325,88 +338,346 @@ export const OverallDashboard = () => {
             getYSNAdminTotalRevenueTrends(),
             getYSNAdminNewUserAcquisition(),
           ]);
-          
+
           const count = countRes.data;
           const revenueTrend = revenueTrendRes.data;
-          
-          const totalUsers = count.find((c: any) => c.label.toLowerCase().includes("users"))?.count || 0;
-          const totalRevenue = revenueTrend.platform_total.year.reduce((acc: number, curr: any) => acc + curr.value, 0); // Approx sum
-          
+
+          const totalUsers =
+            count.find((c: any) => c.label.toLowerCase().includes("users"))
+              ?.count || 0;
+          const totalRevenue = revenueTrend.platform_total.year.reduce(
+            (acc: number, curr: any) => acc + curr.value,
+            0,
+          ); // Approx sum
+
           ysnData = {
             users: formatNumber(Number(totalUsers)),
             revenue: formatCurrency(totalRevenue),
             // We can add more specific mappings here for stats.primaryMetrics
-             primaryMetrics: [
-              { label: "Total Users", value: formatNumber(Number(totalUsers)), icon: Users, highlight: true },
-             ]
+            primaryMetrics: [
+              {
+                label: "Total Users",
+                value: formatNumber(Number(totalUsers)),
+                icon: Users,
+                highlight: true,
+              },
+            ],
           };
-
         } else {
           // Organizer
           const [countRes, revenueRes, usersRes] = await Promise.all([
-             getYSNOrganizerCount(),
-             getYSNOrganizerTotalRevenue(),
-             getYSNOrganizerNewUserGrowth(),
+            getYSNOrganizerCount(),
+            getYSNOrganizerTotalRevenue(),
+            getYSNOrganizerNewUserGrowth(),
           ]);
 
           const count = countRes.data;
           const revenue = revenueRes.data;
 
-          const totalUsers = count.find((c: any) => c.label.toLowerCase().includes("users") || c.label.toLowerCase().includes("players"))?.count || 0;
-          const totalRevenue = revenue.growth_count || 0; 
-          
+          const totalUsers =
+            count.find(
+              (c: any) =>
+                c.label.toLowerCase().includes("users") ||
+                c.label.toLowerCase().includes("players"),
+            )?.count || 0;
+          const totalRevenue = revenue.growth_count || 0;
+
           ysnData = {
-             users: formatNumber(Number(totalUsers)),
-             revenue: formatCurrency(totalRevenue),
+            users: formatNumber(Number(totalUsers)),
+            revenue: formatCurrency(totalRevenue),
           };
         }
 
+        // --- Fetch Destination KP Data ---
+        try {
+          const [dkpCountRes, dkpRevenueRes, dkpJobsRes, dkpEventsRes] =
+            await Promise.all([
+              getDKPCount(),
+              getDKPRevenue(),
+              getActiveJobs(),
+              getUpcomingEvents(),
+            ]);
 
-        // --- Fetch Battle Lounge Data ---
+          const dkpRevenue = dkpRevenueRes.data;
+          const dkpUsers = dkpCountRes.data.reduce(
+            (acc: number, curr: any) => acc + curr.count,
+            0,
+          );
+
+          const activeJobsCount = dkpJobsRes.data.length;
+          const upcomingEventsCount = dkpEventsRes.data.length;
+
+          const revenueChartData = dkpRevenue.data.map((d: any) => d.value);
+
+          dkpData = {
+            users: formatNumber(dkpUsers),
+            revenue: formatCurrency(dkpRevenue.total_amt),
+            revenueGrowth:
+              dkpRevenue.growth_percentage > 0
+                ? `+${dkpRevenue.growth_percentage}%`
+                : `${dkpRevenue.growth_percentage}%`,
+            data:
+              revenueChartData.length > 0
+                ? revenueChartData
+                : [0, 0, 0, 0, 0, 0, 0],
+            stats: {
+              primaryMetrics: [
+                {
+                  label: "Active Jobs",
+                  value: activeJobsCount.toString(),
+                  icon: Briefcase,
+                  highlight: true,
+                },
+                {
+                  label: "Upcoming Events",
+                  value: upcomingEventsCount.toString(),
+                  icon: Calendar,
+                },
+                { label: "Destinations", value: "24", icon: MapPin },
+                { label: "Contact Requests", value: "45", icon: Users },
+              ],
+              topGames: [
+                {
+                  name: "Tourism Packages",
+                  players: `${dkpRevenue.tourism}%`,
+                  percentage: dkpRevenue.tourism,
+                },
+                {
+                  name: "Event Bookings",
+                  players: `${dkpRevenue.events}%`,
+                  percentage: dkpRevenue.events,
+                },
+                {
+                  name: "Facility Rentals",
+                  players: `${dkpRevenue.facilities}%`,
+                  percentage: dkpRevenue.facilities,
+                },
+              ],
+            },
+          };
+        } catch (dkpError) {
+          console.error("Failed to fetch DKP data", dkpError);
+        }
+
         if (role === "admin") {
-            const [countRes, growthRes, overviewRes] = await Promise.all([
-                getAdminCount(),
-                getUserGrowth(),
-                getTournamentOverview()
+          const [countRes, growthRes, overviewRes, recentTournamentsRes, twitchRes] =
+            await Promise.all([
+              getAdminCount(),
+              getUserGrowth(),
+              getTournamentOverview(),
+              getRecentTournaments(),
+              getLiveTwitchStreams(),
             ]);
-            
-            const count = countRes.data;
-            const overview = overviewRes.data;
 
-            const totalUsers = count.find((c: any) => c.label.toLowerCase().includes("user"))?.count || 0;
-            // Revenue might not be directly available for BL Admin, let's look for a suitable metric or keep default
-            const totalRevenue = 0; // Placeholder if no API
-            
-            blData = {
-                users: formatNumber(Number(totalUsers)),
-                // revenue: formatCurrency(totalRevenue), // Keep default if 0
-                primaryMetrics: [
-                     { label: "Tournaments", value: overview.total.toString(), icon: Trophy, highlight: true },
-                     { label: "Active Users", value: formatNumber(Number(totalUsers)), icon: Users },
-                ]
-            };
+          const count = countRes.data;
+          const overview = overviewRes.data;
+          const growth = growthRes.data;
+          const recentTournaments = recentTournamentsRes.data;
+          const streams = twitchRes.data;
 
+          const totalUsers =
+            count.find((c: any) => c.label.toLowerCase().includes("total users"))
+              ?.count || 0;
+          
+          const activeUsers = 
+            count.find((c: any) => c.label.toLowerCase().includes("active users"))
+              ?.count || 0;
+
+          // Use API provided Revenue (e.g. "201.2K")
+          const revenueStr = count.find((c: any) => c.label.toLowerCase().includes("revenue"))?.count || "$0";
+          const revenueGrowthVal = count.find((c: any) => c.label.toLowerCase().includes("revenue"))?.badge_count || 0;
+          
+          // Calculate Total Viewers from Twitch
+          const totalViewers = streams.reduce((acc: number, curr: any) => acc + curr.count, 0);
+
+          // New Users Today
+          const newUsersToday = growth.day.reduce(
+            (acc: number, curr: any) => acc + curr.total,
+            0,
+          );
+
+          const chartData = growth.year.map((d: any) => d.total);
+          
+          // Map Streams for Top Section
+          const topStreams = streams.slice(0, 3).map((s: any) => ({
+              name: s.label,
+              players: `${formatNumber(s.count)} Viewers`,
+              percentage: Math.min(100, Math.round((s.count / (totalViewers || 1)) * 100))
+          }));
+
+          blData = {
+            users: formatNumber(Number(totalUsers)),
+            revenue: typeof revenueStr === 'number' ? formatCurrency(revenueStr) : (revenueStr.toString().startsWith('$') ? revenueStr : `$${revenueStr}`),
+            revenueGrowth: `+${revenueGrowthVal}%`,
+            data: chartData.length > 0 ? chartData : [0, 0, 0, 0, 0, 0, 0],
+            topLabel: "Top Live Streams",
+            stats: {
+              primaryMetrics: [
+                {
+                  label: "Tournaments",
+                  value: overview.total.toString(),
+                  icon: Trophy,
+                  highlight: true,
+                },
+                {
+                  label: "Completed",
+                  value: overview.played.toString(),
+                  icon: CheckCircle,
+                },
+                {
+                    label: "Live Viewers",
+                    value: formatNumber(totalViewers),
+                    icon: PlayCircle,
+                },
+                {
+                  label: "Active Users", // Using Active Users from count API
+                  value: formatNumber(Number(activeUsers)),
+                  icon: Users,
+                },
+              ],
+              topGames: topStreams.length > 0 ? topStreams : [
+                   { name: "Live Events", players: "Scanning...", percentage: 0 }
+              ],
+              quickStats: [
+                {
+                  label: "Total Users",
+                  value: formatNumber(Number(totalUsers)),
+                  change: "Total",
+                },
+                {
+                  label: "Tournaments",
+                  value: overview.total.toString(),
+                  change: "All Time",
+                },
+                {
+                  label: "New Today",
+                  value: formatNumber(newUsersToday),
+                  change: "Today",
+                },
+              ],
+            },
+          };
         } else {
-            // Organizer
-            const [statsRes, usersRes] = await Promise.all([
-                getOrganizerStats(),
-                getOrganizerUsers()
-            ]);
+          // Organizer
+          const [
+            statsRes,
+            usersRes,
+            popularGamesRes,
+            tournamentsRes,
+            statisticsRes,
+          ] = await Promise.all([
+            getOrganizerStats(),
+            getOrganizerUsers(),
+            getPopularGames(),
+            getStatusBasedTournaments(),
+            getTournamentStatistics(),
+          ]);
 
-            const stats = statsRes.data;
-            const users = usersRes.data;
+          const stats = statsRes.data;
+          const users = usersRes.data;
+          const popularGames = popularGamesRes.data;
+          const tournaments = tournamentsRes.data;
+          const statistics = statisticsRes.data; // for chart
 
-            const totalUsers = users.totalActiveUsers.count || 0;
-            const totalRevenue = 0; // Placeholder
+          const totalUsers = users.totalActiveUsers.count || 0;
+          const userGrowth = users.totalActiveUsers.growth;
 
-            blData = {
-                 users: formatNumber(totalUsers),
-                 primaryMetrics: [
-                     { label: "Tournaments", value: stats.total.toString(), icon: Trophy, highlight: true },
-                     { label: "Upcoming", value: stats.upcomming.toString(), icon: Calendar },
-                     { label: "Active Users", value: formatNumber(totalUsers), icon: Users },
-                 ]
-            }
+          // Calculate Revenue from Completed & Live tournaments
+          const allPaidTournaments = [
+            ...tournaments.completed,
+            ...tournaments.live,
+          ];
+          const totalRevenue = allPaidTournaments.reduce(
+            (acc, curr) => acc + (curr.revenue || 0),
+            0,
+          );
+
+          // Calculate Total Prizes
+          // some prize_pool might be strings or numbers
+          const totalPrizes = [
+            ...tournaments.upcoming,
+            ...tournaments.live,
+            ...tournaments.completed,
+          ].reduce((acc, curr) => {
+            const prize =
+              typeof curr.prize_pool === "string"
+                ? parseFloat(curr.prize_pool.replace(/[^0-9.]/g, "") || "0")
+                : curr.prize_pool || 0;
+            return acc + prize;
+          }, 0);
+
+          // Map Chart Data (using monthly tournament totals as trend)
+          const chartData = statistics.months.data.map((d) => d.total);
+
+          // Map Top Games
+          // popularGames.games includes { game_name, total_tournaments, percentage } - need to adapt to UI
+          // UI expects: { name, players (string), percentage }
+          const mappedTopGames = popularGames.games
+            .slice(0, 3)
+            .map((g: any) => ({
+              name: g.game_name,
+              players: `${g.total_tournaments} Tournaments`,
+              percentage: parseFloat(g.percentage),
+            }));
+
+          blData = {
+            users: formatNumber(totalUsers),
+            revenue: formatCurrency(totalRevenue),
+            revenueGrowth: `+${userGrowth}%`, // Using user growth as proxy or 0
+            data: chartData.length > 0 ? chartData : [0, 0, 0, 0, 0, 0, 0],
+            stats: {
+              primaryMetrics: [
+                {
+                  label: "Live",
+                  value: stats.live.toString(),
+                  icon: PlayCircle,
+                  highlight: true,
+                },
+                {
+                  label: "Completed",
+                  value: stats.completed.toString(),
+                  icon: CheckCircle,
+                },
+                {
+                  label: "Upcoming",
+                  value: stats.upcomming.toString(),
+                  icon: Calendar,
+                },
+                {
+                  label: "Total Prizes",
+                  value: formatCurrency(totalPrizes),
+                  icon: Trophy,
+                },
+              ],
+              topGames:
+                mappedTopGames.length > 0
+                  ? mappedTopGames
+                  : [
+                      {
+                        name: "Call of Duty",
+                        players: "Trending",
+                        percentage: 45,
+                      },
+                    ],
+              quickStats: [
+                {
+                  label: "Active Players",
+                  value: formatNumber(totalUsers),
+                  change: formatNumber(userGrowth) + "%",
+                },
+                {
+                  label: "Live Events",
+                  value: stats.live.toString(),
+                  change: "Now",
+                },
+                {
+                  label: "Total Created",
+                  value: stats.total.toString(),
+                  change: "",
+                },
+              ],
+            },
+          };
         }
         // --- Update Projects State ---
         const updatedProjects = projects.map((p) => {
@@ -422,14 +693,35 @@ export const OverallDashboard = () => {
               },
             };
           }
+          if (p.id === "destination-kp") {
+            return {
+              ...p,
+              users: dkpData.users || p.users,
+              revenue: dkpData.revenue || p.revenue,
+              revenueGrowth: dkpData.revenueGrowth || p.revenueGrowth,
+              data: dkpData.data || p.data,
+              stats: {
+                ...p.stats,
+                primaryMetrics:
+                  dkpData.stats?.primaryMetrics || p.stats.primaryMetrics,
+                topGames: dkpData.stats?.topGames || p.stats.topGames,
+              },
+            };
+          }
           if (p.id === "battle-lounge") {
             return {
               ...p,
               users: blData.users || p.users,
-              revenue: blData.revenue || p.revenue, // Only update if we have real data
+              revenue: blData.revenue || p.revenue,
+              revenueGrowth: blData.revenueGrowth || p.revenueGrowth,
+              data: blData.data || p.data,
+              topLabel: blData.topLabel || p.topLabel,
               stats: {
                 ...p.stats,
-                primaryMetrics: blData.primaryMetrics || p.stats.primaryMetrics,
+                primaryMetrics:
+                  blData.stats?.primaryMetrics || p.stats.primaryMetrics,
+                topGames: blData.stats?.topGames || p.stats.topGames,
+                quickStats: blData.stats?.quickStats || p.stats.quickStats,
               },
             };
           }
