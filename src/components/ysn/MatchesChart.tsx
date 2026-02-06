@@ -15,15 +15,7 @@ import {
   type MatchStatisticsData,
 } from "@/lib/api/ysn-organizer";
 
-// Fallback mock data
-const fallbackChartData = [
-  { month: "Jan", played: 45, scheduled: 50 },
-  { month: "Feb", played: 52, scheduled: 60 },
-  { month: "Mar", played: 48, scheduled: 55 },
-  { month: "Apr", played: 60, scheduled: 65 },
-  { month: "May", played: 55, scheduled: 60 },
-  { month: "Jun", played: 70, scheduled: 75 },
-];
+// Fallback mock data removed
 
 const chartConfig = {
   played: {
@@ -43,7 +35,7 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export const MatchesChart = () => {
-  const [chartData, setChartData] = useState<any[]>(fallbackChartData);
+  const [chartData, setChartData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [hasData, setHasData] = useState(false);
 
@@ -63,12 +55,12 @@ export const MatchesChart = () => {
           setHasData(true);
         } else {
           setHasData(false);
-          setChartData(fallbackChartData);
+          setChartData([]);
         }
       } catch (error) {
         console.error("Failed to fetch match statistics:", error);
         setHasData(false);
-        setChartData(fallbackChartData);
+        setChartData([]);
       } finally {
         setLoading(false);
       }
@@ -98,9 +90,7 @@ export const MatchesChart = () => {
               Match Statistics
             </p>
             <p className="text-xs text-muted-foreground">
-              {hasData
-                ? "Live data from API"
-                : "Sample data - API returned empty"}
+              {hasData ? "Live data from API" : "No data available"}
             </p>
           </div>
         </div>

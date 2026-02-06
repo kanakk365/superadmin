@@ -52,7 +52,9 @@ async function getValidAccessToken(): Promise<string | null> {
   return accessToken || null;
 }
 
-export async function GET(request: Request): Promise<NextResponse<AnalyticsResponse>> {
+export async function GET(
+  request: Request,
+): Promise<NextResponse<AnalyticsResponse>> {
   try {
     const accessToken = await getValidAccessToken();
 
@@ -73,7 +75,7 @@ export async function GET(request: Request): Promise<NextResponse<AnalyticsRespo
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
-      }
+      },
     );
 
     if (!accountsResponse.ok) {
@@ -89,31 +91,39 @@ export async function GET(request: Request): Promise<NextResponse<AnalyticsRespo
     const accountsData = await accountsResponse.json();
 
     // Transform accounts data for the frontend
-    const availableAccounts = accountsData.accountSummaries?.map((account: any) => ({
-      id: account.account.replace("accounts/", ""),
-      name: account.displayName,
-      properties: account.propertySummaries?.map((prop: any) => ({
-        id: prop.property.replace("properties/", ""),
-        name: prop.displayName,
-      })) || [],
-    })).filter((acc: any) => acc.properties.length > 0) || [];
+    const availableAccounts =
+      accountsData.accountSummaries
+        ?.map((account: any) => ({
+          id: account.account.replace("accounts/", ""),
+          name: account.displayName,
+          properties:
+            account.propertySummaries?.map((prop: any) => ({
+              id: prop.property.replace("properties/", ""),
+              name: prop.displayName,
+            })) || [],
+        }))
+        .filter((acc: any) => acc.properties.length > 0) || [];
 
     // Determine which property to use
     let propertyId = requestedPropertyId;
     let selectedFromName = "";
 
     if (!propertyId) {
-        // Auto-select first available
-        if (availableAccounts.length > 0 && availableAccounts[0].properties.length > 0) {
-            propertyId = availableAccounts[0].properties[0].id;
-        }
+      // Auto-select first available
+      if (
+        availableAccounts.length > 0 &&
+        availableAccounts[0].properties.length > 0
+      ) {
+        propertyId = availableAccounts[0].properties[0].id;
+      }
     }
 
     if (!propertyId) {
       return NextResponse.json({
         connected: true,
         accounts: availableAccounts,
-        error: "No Google Analytics properties found. Please set up a GA4 property first.",
+        error:
+          "No Google Analytics properties found. Please set up a GA4 property first.",
       });
     }
 
@@ -139,7 +149,7 @@ export async function GET(request: Request): Promise<NextResponse<AnalyticsRespo
           ],
           orderBys: [{ dimension: { dimensionName: "date" } }],
         }),
-      }
+      },
     );
 
     if (!reportResponse.ok) {
@@ -169,7 +179,7 @@ export async function GET(request: Request): Promise<NextResponse<AnalyticsRespo
           orderBys: [{ metric: { metricName: "totalUsers" }, desc: true }],
           limit: 5,
         }),
-      }
+      },
     );
 
     const sourcesData = sourcesResponse.ok
@@ -208,7 +218,7 @@ export async function GET(request: Request): Promise<NextResponse<AnalyticsRespo
           sessions,
           pageViews,
         };
-      }
+      },
     );
 
     const avgBounceRate = rows.length > 0 ? totalBounceRate / rows.length : 0;
@@ -219,7 +229,7 @@ export async function GET(request: Request): Promise<NextResponse<AnalyticsRespo
     const totalSourceUsers = sourceRows.reduce(
       (sum: number, row: { metricValues: Array<{ value: string }> }) =>
         sum + parseInt(row.metricValues[0]?.value || "0"),
-      0
+      0,
     );
 
     const trafficSources = sourceRows.map(
@@ -234,11 +244,12 @@ export async function GET(request: Request): Promise<NextResponse<AnalyticsRespo
           percentage:
             totalSourceUsers > 0 ? (users / totalSourceUsers) * 100 : 0,
         };
-      }
+      },
     );
 
     return NextResponse.json({
       connected: true,
+      accounts: availableAccounts,
       data: {
         overview: {
           totalUsers,

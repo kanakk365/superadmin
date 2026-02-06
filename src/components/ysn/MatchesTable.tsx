@@ -16,60 +16,7 @@ import {
   type MatchesData,
 } from "@/lib/api/ysn-organizer";
 
-// Fallback mock data
-const fallbackUpcomingMatches = [
-  {
-    match: "Rockets vs Comets",
-    league: "Super Cup",
-    date: "Nov 28, 2025",
-    time: "18:00",
-  },
-  {
-    match: "Titans vs Giants",
-    league: "Qualifier",
-    date: "Nov 29, 2025",
-    time: "20:00",
-  },
-  {
-    match: "Wolves vs Bears",
-    league: "Friendly",
-    date: "Dec 01, 2025",
-    time: "16:30",
-  },
-  {
-    match: "Eagles vs Sharks",
-    league: "Championship",
-    date: "Dec 03, 2025",
-    time: "19:00",
-  },
-];
-
-const fallbackRecentMatches = [
-  {
-    match: "Tigers vs Lions",
-    league: "Premier League",
-    viewers: "12.5K",
-    result: "2 - 1",
-  },
-  {
-    match: "Eagles vs Sharks",
-    league: "Championship",
-    viewers: "8.2K",
-    result: "0 - 0",
-  },
-  {
-    match: "Rockets vs Comets",
-    league: "Super Cup",
-    viewers: "15.1K",
-    result: "Pending",
-  },
-  {
-    match: "Titans vs Giants",
-    league: "Qualifier",
-    viewers: "5.6K",
-    result: "3 - 2",
-  },
-];
+// Fallback mock data removed
 
 export const MatchesTable = () => {
   const [matchType, setMatchType] = React.useState<"upcoming" | "recent">(
@@ -109,17 +56,13 @@ export const MatchesTable = () => {
   // Get current matches based on type
   const getCurrentMatches = () => {
     if (!hasData || !matchesData) {
-      return matchType === "upcoming"
-        ? fallbackUpcomingMatches
-        : fallbackRecentMatches;
+      return [];
     }
 
     const data =
       matchType === "upcoming" ? matchesData.upcoming : matchesData.recents;
     if (!data || data.length === 0) {
-      return matchType === "upcoming"
-        ? fallbackUpcomingMatches
-        : fallbackRecentMatches;
+      return [];
     }
 
     return data;
@@ -137,9 +80,7 @@ export const MatchesTable = () => {
           <div>
             <h3 className="text-lg font-semibold text-foreground">Matches</h3>
             <p className="text-xs text-muted-foreground">
-              {hasData
-                ? "Live data from API"
-                : "Sample data - API returned empty"}
+              {hasData ? "Live data from API" : "No matches found"}
             </p>
           </div>
         </div>

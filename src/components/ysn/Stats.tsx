@@ -27,43 +27,7 @@ import {
   type TotalRevenueData,
 } from "@/lib/api/ysn-organizer";
 
-// Fallback mock data
-const fallbackRevenueData = {
-  day: [
-    { name: "00:00", value: 120 },
-    { name: "04:00", value: 150 },
-    { name: "08:00", value: 450 },
-    { name: "12:00", value: 890 },
-    { name: "16:00", value: 720 },
-    { name: "20:00", value: 950 },
-    { name: "23:59", value: 400 },
-  ],
-  week: [
-    { name: "Mon", value: 1200 },
-    { name: "Tue", value: 3400 },
-    { name: "Wed", value: 3800 },
-    { name: "Thu", value: 8500 },
-    { name: "Fri", value: 12500 },
-    { name: "Sat", value: 4100 },
-    { name: "Sun", value: 4100 },
-  ],
-  month: [
-    { name: "Week 1", value: 120000 },
-    { name: "Week 2", value: 160000 },
-    { name: "Week 3", value: 180000 },
-    { name: "Week 4", value: 220000 },
-  ],
-  year: [
-    { name: "Jan", value: 1200 },
-    { name: "Feb", value: 3400 },
-    { name: "Mar", value: 0 },
-    { name: "Apr", value: 8500 },
-    { name: "May", value: 12500 },
-    { name: "Jun", value: 0 },
-    { name: "Jul", value: 4100 },
-    { name: "Aug", value: 300 },
-  ],
-};
+// Fallback mock data removed
 
 const timeLabels: Record<string, Record<number, string>> = {
   day: {
@@ -171,12 +135,12 @@ export const YSNStats = () => {
   // Transform API revenue data to chart format
   const getChartData = () => {
     if (!revenueData?.data?.[timeRange]) {
-      return fallbackRevenueData[timeRange];
+      return [];
     }
 
     const apiData = revenueData.data[timeRange];
     if (apiData.length === 0) {
-      return fallbackRevenueData[timeRange];
+      return [];
     }
 
     return apiData.map((item) => ({
@@ -383,26 +347,9 @@ export const YSNStats = () => {
                     </div>
                   ))
                 ) : (
-                  <>
-                    <div className="flex flex-col gap-1">
-                      <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">
-                        Team Alpha
-                      </span>
-                      <span className="text-xl font-bold text-white">45%</span>
-                    </div>
-                    <div className="flex flex-col gap-1 border-l border-white/10 pl-6">
-                      <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">
-                        Team Beta
-                      </span>
-                      <span className="text-xl font-bold text-white">32%</span>
-                    </div>
-                    <div className="flex flex-col gap-1 border-l border-white/10 pl-6">
-                      <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">
-                        Team Gamma
-                      </span>
-                      <span className="text-xl font-bold text-white">23%</span>
-                    </div>
-                  </>
+                  <div className="col-span-3 text-center py-4 text-white/50 text-sm">
+                    No team revenue data available
+                  </div>
                 )}
               </div>
             </div>

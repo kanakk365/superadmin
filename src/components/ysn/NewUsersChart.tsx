@@ -23,47 +23,7 @@ import {
   type NewUserGrowthData,
 } from "@/lib/api/ysn-organizer";
 
-// Fallback mock data when API returns empty
-const fallbackDataMap = {
-  day: [
-    { name: "00:00", value: 12 },
-    { name: "04:00", value: 18 },
-    { name: "08:00", value: 45 },
-    { name: "12:00", value: 89 },
-    { name: "16:00", value: 72 },
-    { name: "20:00", value: 95 },
-    { name: "23:59", value: 40 },
-  ],
-  week: [
-    { name: "Mon", value: 120 },
-    { name: "Tue", value: 150 },
-    { name: "Wed", value: 180 },
-    { name: "Thu", value: 220 },
-    { name: "Fri", value: 250 },
-    { name: "Sat", value: 300 },
-    { name: "Sun", value: 280 },
-  ],
-  month: [
-    { name: "Week 1", value: 500 },
-    { name: "Week 2", value: 650 },
-    { name: "Week 3", value: 800 },
-    { name: "Week 4", value: 950 },
-  ],
-  year: [
-    { name: "Jan", value: 2000 },
-    { name: "Feb", value: 2500 },
-    { name: "Mar", value: 3000 },
-    { name: "Apr", value: 2800 },
-    { name: "May", value: 3200 },
-    { name: "Jun", value: 4000 },
-    { name: "Jul", value: 4500 },
-    { name: "Aug", value: 5000 },
-    { name: "Sep", value: 5500 },
-    { name: "Oct", value: 6000 },
-    { name: "Nov", value: 6500 },
-    { name: "Dec", value: 7000 },
-  ],
-};
+// Fallback data removed
 
 export const NewUsersChart = () => {
   const [timeRange, setTimeRange] = useState<"day" | "week" | "month" | "year">(
@@ -103,7 +63,7 @@ export const NewUsersChart = () => {
         value: item.value,
       }));
     }
-    return fallbackDataMap[timeRange];
+    return [];
   };
 
   const chartData = getChartData();
@@ -124,7 +84,7 @@ export const NewUsersChart = () => {
           <p className="text-sm text-muted-foreground">
             {hasData
               ? "Total new user registrations over time"
-              : "Sample data - API returned empty"}
+              : "No user growth data available"}
           </p>
         </div>
         <div className="flex items-center gap-4">
