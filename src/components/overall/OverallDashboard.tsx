@@ -26,6 +26,7 @@ import {
   Flame,
   MapPin,
   Sparkles,
+  Video,
 } from "lucide-react";
 import {
   Card,
@@ -77,7 +78,7 @@ import {
   getDKPRevenue,
   getActiveJobs,
   getUpcomingEvents,
-  getGuestChannel,
+  getPageAdRevenue,
   getEventAttendanceTrends,
 } from "@/lib/api/dkp";
 
@@ -345,23 +346,46 @@ export const OverallDashboard = () => {
           const totalUsers =
             count.find((c: any) => c.label.toLowerCase().includes("users"))
               ?.count || 0;
-          const totalRevenue = revenueTrend.platform_total.year.reduce(
-            (acc: number, curr: any) => acc + curr.value,
-            0,
-          ); // Approx sum
+          const totalRevenue =
+            count.find((c: any) => c.label === "Total Platform Revenue")
+              ?.count || 0;
+
+          const totalTeams =
+            count.find((c: any) => c.label === "Total Teams")?.count || 0;
+          const totalOrgs =
+            count.find((c: any) => c.label === "Total Organizations")?.count ||
+            0;
+          const eventsStreamed =
+            count.find((c: any) => c.label === "Events Streamed")?.count || 0;
 
           ysnData = {
             users: formatNumber(Number(totalUsers)),
             revenue: formatCurrency(totalRevenue),
-            // We can add more specific mappings here for stats.primaryMetrics
-            primaryMetrics: [
-              {
-                label: "Total Users",
-                value: formatNumber(Number(totalUsers)),
-                icon: Users,
-                highlight: true,
-              },
-            ],
+            stats: {
+              primaryMetrics: [
+                {
+                  label: "Total Teams",
+                  value: totalTeams.toString(),
+                  icon: Users,
+                },
+                {
+                  label: "Organizations",
+                  value: totalOrgs.toString(),
+                  icon: Building2,
+                },
+                {
+                  label: "Events Streamed",
+                  value: formatNumber(eventsStreamed),
+                  icon: Video,
+                  highlight: true,
+                },
+                {
+                  label: "Total Users",
+                  value: formatNumber(Number(totalUsers)),
+                  icon: Users,
+                },
+              ],
+            },
           };
         } else {
           // Organizer
@@ -389,23 +413,47 @@ export const OverallDashboard = () => {
         }
 
         // --- Fetch Destination KP Data ---
+        // --- Fetch Destination KP Data ---
         try {
-          const [dkpCountRes, dkpRevenueRes, dkpJobsRes, dkpEventsRes] =
-            await Promise.all([
-              getDKPCount(),
-              getDKPRevenue(),
-              getActiveJobs(),
-              getUpcomingEvents(),
-            ]);
+          const [
+            dkpCountRes,
+            dkpRevenueRes,
+            dkpJobsRes,
+            dkpEventsRes,
+            dkpAdRevenueRes,
+            dkpAttendanceRes,
+          ] = await Promise.all([
+            getDKPCount(),
+            getDKPRevenue(),
+            getActiveJobs(),
+            getUpcomingEvents(),
+            getPageAdRevenue(),
+            getEventAttendanceTrends(),
+          ]);
 
           const dkpRevenue = dkpRevenueRes.data;
-          const dkpUsers = dkpCountRes.data.reduce(
-            (acc: number, curr: any) => acc + curr.count,
-            0,
-          );
+          // Only sum actual users (Visitors + Subscribers)
+          const dkpUsers = dkpCountRes.data
+            .filter((i: any) => ["Visitors", "Subscribers"].includes(i.label))
+            .reduce((acc: number, curr: any) => acc + curr.count, 0);
+
+          const contactReqCount =
+            dkpCountRes.data.find((i: any) => i.label === "Contact Req")
+              ?.count || 0;
 
           const activeJobsCount = dkpJobsRes.data.length;
           const upcomingEventsCount = dkpEventsRes.data.length;
+          const adRevenueTotal = dkpAdRevenueRes.data.total;
+
+          const totalAttendees = dkpAttendanceRes.data.reduce(
+            (acc: number, curr: any) => acc + curr.attendees,
+            0,
+          );
+
+          const projectedAttendees = dkpAttendanceRes.data.reduce(
+            (acc: number, curr: any) => acc + curr.projected,
+            0,
+          );
 
           const revenueChartData = dkpRevenue.data.map((d: any) => d.value);
 
@@ -433,24 +481,53 @@ export const OverallDashboard = () => {
                   value: upcomingEventsCount.toString(),
                   icon: Calendar,
                 },
-                { label: "Destinations", value: "24", icon: MapPin },
-                { label: "Contact Requests", value: "45", icon: Users },
+                // Replaced Destinations (No API) with Ad Revenue (Real API)
+                {
+                  label: "Ad Revenue",
+                  value: formatCurrency(adRevenueTotal), // e.g. $160k
+                  icon: DollarSign,
+                },
+                // Replaced Hardcoded Contact Requests with Real API
+                {
+                  label: "Contact Requests",
+                  value: contactReqCount.toString(),
+                  icon: Users,
+                },
               ],
               topGames: [
                 {
                   name: "Tourism Packages",
-                  players: `${dkpRevenue.tourism}%`,
-                  percentage: dkpRevenue.tourism,
+                  players: formatCurrency(dkpRevenue.tourism),
+                  percentage: (dkpRevenue.tourism / dkpRevenue.total_amt) * 100,
                 },
                 {
                   name: "Event Bookings",
-                  players: `${dkpRevenue.events}%`,
-                  percentage: dkpRevenue.events,
+                  players: formatCurrency(dkpRevenue.events),
+                  percentage: (dkpRevenue.events / dkpRevenue.total_amt) * 100,
                 },
                 {
                   name: "Facility Rentals",
-                  players: `${dkpRevenue.facilities}%`,
-                  percentage: dkpRevenue.facilities,
+                  players: formatCurrency(dkpRevenue.facilities),
+                  percentage:
+                    (dkpRevenue.facilities / dkpRevenue.total_amt) * 100,
+                },
+              ],
+              quickStats: [
+                {
+                  label: "Total Attendees",
+                  value: formatNumber(totalAttendees),
+                  change: `Year to Date`,
+                },
+                {
+                  label: "Projected",
+                  value: formatNumber(projectedAttendees),
+                  change: "Year End",
+                },
+                {
+                  label: "Avg. Job Apps",
+                  // Simple average derived from active jobs if available, else 0
+                  value: dkpJobsRes.data.length > 0 ? "0" : "0",
+                  change: "Per Job",
                 },
               ],
             },
@@ -460,14 +537,19 @@ export const OverallDashboard = () => {
         }
 
         if (role === "admin") {
-          const [countRes, growthRes, overviewRes, recentTournamentsRes, twitchRes] =
-            await Promise.all([
-              getAdminCount(),
-              getUserGrowth(),
-              getTournamentOverview(),
-              getRecentTournaments(),
-              getLiveTwitchStreams(),
-            ]);
+          const [
+            countRes,
+            growthRes,
+            overviewRes,
+            recentTournamentsRes,
+            twitchRes,
+          ] = await Promise.all([
+            getAdminCount(),
+            getUserGrowth(),
+            getTournamentOverview(),
+            getRecentTournaments(),
+            getLiveTwitchStreams(),
+          ]);
 
           const count = countRes.data;
           const overview = overviewRes.data;
@@ -476,19 +558,28 @@ export const OverallDashboard = () => {
           const streams = twitchRes.data;
 
           const totalUsers =
-            count.find((c: any) => c.label.toLowerCase().includes("total users"))
-              ?.count || 0;
-          
-          const activeUsers = 
-            count.find((c: any) => c.label.toLowerCase().includes("active users"))
-              ?.count || 0;
+            count.find((c: any) =>
+              c.label.toLowerCase().includes("total users"),
+            )?.count || 0;
+
+          const activeUsers =
+            count.find((c: any) =>
+              c.label.toLowerCase().includes("active users"),
+            )?.count || 0;
 
           // Use API provided Revenue (e.g. "201.2K")
-          const revenueStr = count.find((c: any) => c.label.toLowerCase().includes("revenue"))?.count || "$0";
-          const revenueGrowthVal = count.find((c: any) => c.label.toLowerCase().includes("revenue"))?.badge_count || 0;
-          
+          const revenueStr =
+            count.find((c: any) => c.label.toLowerCase().includes("revenue"))
+              ?.count || "$0";
+          const revenueGrowthVal =
+            count.find((c: any) => c.label.toLowerCase().includes("revenue"))
+              ?.badge_count || 0;
+
           // Calculate Total Viewers from Twitch
-          const totalViewers = streams.reduce((acc: number, curr: any) => acc + curr.count, 0);
+          const totalViewers = streams.reduce(
+            (acc: number, curr: any) => acc + curr.count,
+            0,
+          );
 
           // New Users Today
           const newUsersToday = growth.day.reduce(
@@ -497,17 +588,25 @@ export const OverallDashboard = () => {
           );
 
           const chartData = growth.year.map((d: any) => d.total);
-          
+
           // Map Streams for Top Section
           const topStreams = streams.slice(0, 3).map((s: any) => ({
-              name: s.label,
-              players: `${formatNumber(s.count)} Viewers`,
-              percentage: Math.min(100, Math.round((s.count / (totalViewers || 1)) * 100))
+            name: s.label,
+            players: `${formatNumber(s.count)} Viewers`,
+            percentage: Math.min(
+              100,
+              Math.round((s.count / (totalViewers || 1)) * 100),
+            ),
           }));
 
           blData = {
             users: formatNumber(Number(totalUsers)),
-            revenue: typeof revenueStr === 'number' ? formatCurrency(revenueStr) : (revenueStr.toString().startsWith('$') ? revenueStr : `$${revenueStr}`),
+            revenue:
+              typeof revenueStr === "number"
+                ? formatCurrency(revenueStr)
+                : revenueStr.toString().startsWith("$")
+                  ? revenueStr
+                  : `$${revenueStr}`,
             revenueGrowth: `+${revenueGrowthVal}%`,
             data: chartData.length > 0 ? chartData : [0, 0, 0, 0, 0, 0, 0],
             topLabel: "Top Live Streams",
@@ -525,9 +624,9 @@ export const OverallDashboard = () => {
                   icon: CheckCircle,
                 },
                 {
-                    label: "Live Viewers",
-                    value: formatNumber(totalViewers),
-                    icon: PlayCircle,
+                  label: "Live Viewers",
+                  value: formatNumber(totalViewers),
+                  icon: PlayCircle,
                 },
                 {
                   label: "Active Users", // Using Active Users from count API
@@ -535,9 +634,16 @@ export const OverallDashboard = () => {
                   icon: Users,
                 },
               ],
-              topGames: topStreams.length > 0 ? topStreams : [
-                   { name: "Live Events", players: "Scanning...", percentage: 0 }
-              ],
+              topGames:
+                topStreams.length > 0
+                  ? topStreams
+                  : [
+                      {
+                        name: "Live Events",
+                        players: "Scanning...",
+                        percentage: 0,
+                      },
+                    ],
               quickStats: [
                 {
                   label: "Total Users",
@@ -608,10 +714,6 @@ export const OverallDashboard = () => {
 
           // Map Chart Data (using monthly tournament totals as trend)
           const chartData = statistics.months.data.map((d) => d.total);
-
-          // Map Top Games
-          // popularGames.games includes { game_name, total_tournaments, percentage } - need to adapt to UI
-          // UI expects: { name, players (string), percentage }
           const mappedTopGames = popularGames.games
             .slice(0, 3)
             .map((g: any) => ({
