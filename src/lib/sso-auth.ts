@@ -208,12 +208,6 @@ function decodeToken(tokenParam: string): string {
   }
 }
 
-/**
- * SSO Login Flow (when token is in URL)
- * 1. Decode Base64 token (or use raw token)
- * 2. Get user details from MVC
- * 3. Direct login to oneplace.io
- */
 export async function ssoLogin(tokenParam: string): Promise<AuthUser> {
   // Step 1: Decode the token (handles both Base64 and raw tokens)
   const token = decodeToken(tokenParam);
@@ -304,6 +298,7 @@ export function applyPermissions(
 ): AuthUser {
   const { data } = response;
   const overrides = getHardcodedOverrides(email);
+  console.log("[SSO] Overrides for", email, ":", overrides);
 
   // Determine role based on user_type
   // user_type === 1 means admin, anything else is organizer
@@ -327,6 +322,12 @@ export function applyPermissions(
     bl_mode: overrides?.bl_mode || (data.user_type === 1 ? "admin" : "org"),
   };
 
+  console.log(
+    "[SSO] AuthUser created:",
+    authUser.email,
+    "bl_mode:",
+    authUser.bl_mode,
+  );
   return authUser;
 }
 
@@ -334,5 +335,6 @@ export function applyPermissions(
  * Save auth user to store
  */
 export function saveAuthUser(user: AuthUser): void {
+  console.log("[SSO] Saving user:", user.email, "bl_mode:", user.bl_mode);
   useAuthStore.getState().setUser(user);
 }

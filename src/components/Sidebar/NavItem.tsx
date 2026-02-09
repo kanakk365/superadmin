@@ -93,8 +93,14 @@ export const NavItemComponent = ({
       onToggleItem(item.label);
     }
     if (item.href) {
-      if (item.label === "Battle Lounge" || item.label === "YSN") {
-        router.push(`${item.href}/${role}`);
+      if (item.label === "Battle Lounge") {
+        // Use bl_mode for Battle Lounge navigation
+        const blMode = user?.bl_mode === "admin" ? "admin" : "organizer";
+        router.push(`${item.href}/${blMode}`);
+      } else if (item.label === "YSN") {
+        // Use ysn_mode for YSN navigation
+        const ysnMode = user?.ysn_mode === "admin" ? "admin" : "organizer";
+        router.push(`${item.href}/${ysnMode}`);
       } else {
         router.push(item.href);
       }

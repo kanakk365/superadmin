@@ -55,7 +55,15 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       isLoading: false,
       error: null,
-      setUser: (user) => set({ user, isAuthenticated: true, error: null }),
+      setUser: (user) => {
+        console.log(
+          "[AuthStore] Setting user:",
+          user.email,
+          "bl_mode:",
+          user.bl_mode,
+        );
+        set({ user, isAuthenticated: true, error: null });
+      },
       setLoading: (isLoading) => set({ isLoading }),
       setError: (error) => set({ error, isLoading: false }),
       logout: () => {
@@ -70,6 +78,24 @@ export const useAuthStore = create<AuthState>()(
     {
       name: "auth-storage",
       storage: createJSONStorage(() => customStorage),
+      version: 2, // Increment version to force re-login with new fields
+      migrate: (persistedState, version) => {
+        // If old version, clear and require re-login
+        if (version < 2) {
+          console.log(
+            "[AuthStore] Migrating from version",
+            version,
+            "to 2 - clearing old data",
+          );
+          return {
+            user: null,
+            isAuthenticated: false,
+            isLoading: false,
+            error: null,
+          };
+        }
+        return persistedState as AuthState;
+      },
     },
   ),
 );

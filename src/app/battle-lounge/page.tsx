@@ -12,10 +12,13 @@ export default function BattleLoungeLogin() {
 
   // Auto-redirect based on user's bl_mode
   useEffect(() => {
+    console.log("[BL] User:", user?.email, "bl_mode:", user?.bl_mode);
     if (user?.bl_mode) {
       if (user.bl_mode === "admin") {
+        console.log("[BL] Redirecting to admin");
         router.replace("/battle-lounge/admin");
       } else {
+        console.log("[BL] Redirecting to organizer");
         router.replace("/battle-lounge/organizer");
       }
     }
