@@ -19,7 +19,10 @@ const protectedRoutePrefixes = [
 ];
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, searchParams } = request.nextUrl;
+
+  // Check if this is an SSO login attempt (has token parameter)
+  const hasSsoToken = searchParams.has("token");
 
   // Check if the current route is public
   const isPublicRoute = publicRoutes.some(
@@ -39,7 +42,7 @@ export function middleware(request: NextRequest) {
 
   if (authStorage?.value) {
     try {
-      const parsed = JSON.parse(authStorage.value);
+      const parsed = JSON.parse(decodeURIComponent(authStorage.value));
       isAuthenticated = parsed?.state?.isAuthenticated === true;
     } catch {
       isAuthenticated = false;
@@ -53,8 +56,14 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // If authenticated user tries to access login page, redirect to overall dashboard
-  if (isPublicRoute && isAuthenticated && pathname === "/login") {
+  // If authenticated user tries to access login page WITHOUT SSO token, redirect to dashboard
+  // But allow if there's an SSO token - let the page handle re-authentication
+  if (
+    isPublicRoute &&
+    isAuthenticated &&
+    pathname === "/login" &&
+    !hasSsoToken
+  ) {
     return NextResponse.redirect(new URL("/overall", request.url));
   }
 

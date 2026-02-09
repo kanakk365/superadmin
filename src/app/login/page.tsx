@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Mail,
@@ -16,7 +16,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
-import { loginUser, getUserRole } from "@/lib/auth";
+import { ssoLogin, normalLogin, saveAuthUser } from "@/lib/sso-auth";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function LoginPage() {
@@ -24,46 +24,115 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSsoLoading, setIsSsoLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const router = useRouter();
-  const { setUser, isAuthenticated } = useAuthStore();
+  // Track if we've already started SSO login to prevent infinite loops
+  const ssoProcessedRef = useRef(false);
 
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { isAuthenticated, logout } = useAuthStore();
+
+  // Check for SSO token in URL on mount
   useEffect(() => {
-    if (isAuthenticated) {
+    const token = searchParams.get("token");
+
+    // Only process token once
+    if (token && !ssoProcessedRef.current) {
+      ssoProcessedRef.current = true;
+      console.log("[Login] Token from URL:", token);
+
+      // SSO login - logout first if already authenticated
+      if (isAuthenticated) {
+        console.log("[Login] Logging out existing user for SSO re-auth...");
+        logout();
+      }
+
+      console.log("[Login] Starting SSO login...");
+      handleSsoLogin(token);
+    }
+  }, [searchParams]);
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated && !searchParams.get("token")) {
       router.push("/overall");
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, router, searchParams]);
 
+  // Handle SSO token login
+  const handleSsoLogin = async (token: string) => {
+    console.log("[Login] handleSsoLogin called with token:", token);
+    setIsSsoLoading(true);
+    setError(null);
+
+    try {
+      const user = await ssoLogin(token);
+      console.log("[Login] SSO login successful, user:", user.email);
+      saveAuthUser(user);
+
+      // Use full page redirect to avoid React state conflicts
+      setTimeout(() => {
+        window.location.href = "/overall";
+      }, 500);
+    } catch (err) {
+      console.error("SSO login error:", err);
+      setError("SSO authentication failed. Please login manually.");
+      setIsSsoLoading(false);
+      ssoProcessedRef.current = false; // Allow retry
+    }
+  };
+
+  // Handle normal email/password login
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
 
     try {
-      const response = await loginUser(email, password);
+      const user = await normalLogin(email, password);
+      saveAuthUser(user);
 
-      if (response.status) {
-        const role = getUserRole(response.data.user_type);
-
-        setUser({
-          ...response.data,
-          role,
-        });
-
-        setTimeout(() => {
-          router.push("/overall");
-        }, 800);
-      } else {
-        setError(response.message || "Invalid credentials.");
-      }
+      setTimeout(() => {
+        router.push("/overall");
+      }, 800);
     } catch (err) {
-      setError("Unable to connect to server.");
+      setError("Invalid credentials or unable to connect.");
       console.error("Login error:", err);
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Show full-page loading for SSO
+  if (isSsoLoading) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center bg-black relative overflow-hidden font-sans">
+        <div className="absolute inset-0 pointer-events-none">
+          <div
+            className="absolute -top-[20%] -left-[10%] w-[70vw] h-[70vw] rounded-full bg-violet-600/10 blur-[120px] animate-pulse"
+            style={{ animationDuration: "8s" }}
+          />
+          <div
+            className="absolute -bottom-[20%] -right-[10%] w-[60vw] h-[60vw] rounded-full bg-blue-600/10 blur-[100px] animate-pulse"
+            style={{ animationDuration: "10s", animationDelay: "1s" }}
+          />
+        </div>
+        <div className="relative z-10 flex flex-col items-center gap-6">
+          <Loader2 className="w-12 h-12 text-violet-500 animate-spin" />
+          <div className="text-center">
+            <h2 className="text-xl font-semibold text-white mb-2">
+              Authenticating...
+            </h2>
+            <p className="text-muted-foreground">
+              Please wait while we verify your credentials
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-black relative overflow-hidden font-sans selection:bg-violet-500/30">

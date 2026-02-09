@@ -1,10 +1,39 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Gamepad2, Shield, Users } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Gamepad2, Shield, Users, Loader2 } from "lucide-react";
+import { useAuthStore } from "@/store/auth-store";
 
 export default function BattleLoungeLogin() {
+  const router = useRouter();
+  const user = useAuthStore((state) => state.user);
+
+  // Auto-redirect based on user's bl_mode
+  useEffect(() => {
+    if (user?.bl_mode) {
+      if (user.bl_mode === "admin") {
+        router.replace("/battle-lounge/admin");
+      } else {
+        router.replace("/battle-lounge/organizer");
+      }
+    }
+  }, [user, router]);
+
+  // Show loading while redirecting
+  if (user?.bl_mode) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-8 h-8 text-primary animate-spin" />
+          <p className="text-muted-foreground">Redirecting...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Fallback: show portal selection if bl_mode is not set
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-background relative overflow-hidden">
       {/* Background Effects */}

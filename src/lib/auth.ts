@@ -46,6 +46,12 @@ export function saveAuthData(data: LoginResponse["data"]): void {
   const user: AuthUser = {
     ...data,
     role,
+    is_battlelounge: true,
+    is_ysn: true,
+    is_dkp: true,
+    is_rivalis: true,
+    ysn_mode: role === "admin" ? "admin" : "org",
+    bl_mode: role === "admin" ? "admin" : "org",
   };
   useAuthStore.getState().setUser(user);
 }

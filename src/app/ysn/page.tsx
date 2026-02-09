@@ -1,9 +1,39 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Trophy, Shield, Users } from "lucide-react";
+import { Trophy, Shield, Users, Loader2 } from "lucide-react";
+import { useAuthStore } from "@/store/auth-store";
 
 export default function YSNLogin() {
+  const router = useRouter();
+  const user = useAuthStore((state) => state.user);
+
+  // Auto-redirect based on user's ysn_mode
+  useEffect(() => {
+    if (user?.ysn_mode) {
+      if (user.ysn_mode === "admin") {
+        router.replace("/ysn/admin");
+      } else {
+        router.replace("/ysn/organizer");
+      }
+    }
+  }, [user, router]);
+
+  // Show loading while redirecting
+  if (user?.ysn_mode) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-8 h-8 text-pink-500 animate-spin" />
+          <p className="text-muted-foreground">Redirecting...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Fallback: show portal selection if ysn_mode is not set
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-background relative overflow-hidden">
       {/* Background Effects */}

@@ -7,6 +7,13 @@ export interface AuthUser {
   name: string;
   email: string;
   role: "admin" | "organizer";
+  user_type: number;
+  is_battlelounge: boolean;
+  is_ysn: boolean;
+  is_dkp: boolean;
+  is_rivalis: boolean;
+  ysn_mode: "admin" | "org";
+  bl_mode: "admin" | "org";
 }
 
 interface AuthState {
@@ -54,7 +61,8 @@ export const useAuthStore = create<AuthState>()(
       logout: () => {
         // Clear cookie on logout
         if (typeof window !== "undefined") {
-          document.cookie = "auth-storage=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+          document.cookie =
+            "auth-storage=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
         }
         set({ user: null, isAuthenticated: false, error: null });
       },
