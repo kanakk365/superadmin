@@ -130,23 +130,26 @@ export const MatchesTable = () => {
               </tr>
             </thead>
             <tbody className="text-sm text-foreground">
-              {currentMatches.map((item: any, index: number) => (
+              {currentMatches.map((item: Match, index: number) => (
                 <tr
-                  key={item.match || item.id || index}
+                  key={item.id || index}
                   className="border-b border-border/60 last:border-0 hover:bg-muted/30 transition-colors"
                 >
                   <td className="px-6 py-3 text-sm font-medium text-foreground">
-                    {item.match || `${item.team1} vs ${item.team2}`}
+                    {item.match ||
+                      (item.team_name && item.opt_team_name
+                        ? `${item.team_name} vs ${item.opt_team_name}`
+                        : `${item.team1 || ""} vs ${item.team2 || ""}`)}
                   </td>
                   <td className="px-6 py-3 text-sm font-normal text-foreground">
-                    {item.league}
+                    {item.league || "-"}
                   </td>
                   <td className="px-6 py-3 text-sm font-normal text-foreground">
-                    {item.date}
+                    {item.date || "-"}
                   </td>
                   <td className="px-6 py-3 text-sm font-normal text-foreground">
                     <span className="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800 dark:bg-purple-500/20 dark:text-purple-300">
-                      {item.time}
+                      {item.time || "-"}
                     </span>
                   </td>
                 </tr>
@@ -164,30 +167,36 @@ export const MatchesTable = () => {
               </tr>
             </thead>
             <tbody className="text-sm text-foreground">
-              {currentMatches.map((item: any, index: number) => (
+              {currentMatches.map((item: Match, index: number) => (
                 <tr
-                  key={item.match || item.id || index}
+                  key={item.id || index}
                   className="border-b border-border/60 last:border-0 hover:bg-muted/30 transition-colors"
                 >
                   <td className="px-6 py-3 text-sm font-medium text-foreground">
-                    {item.match || `${item.team1} vs ${item.team2}`}
+                    {item.match ||
+                      (item.team_name && item.opt_team_name
+                        ? `${item.team_name} vs ${item.opt_team_name}`
+                        : `${item.team1 || ""} vs ${item.team2 || ""}`)}
                   </td>
                   <td className="px-6 py-3 text-sm font-normal text-foreground">
-                    {item.league}
+                    {item.league || "-"}
                   </td>
                   <td className="px-6 py-3 text-sm font-normal text-foreground">
-                    {item.viewers}
+                    {item.viewers ?? 0}
                   </td>
                   <td className="px-6 py-3 text-sm font-normal text-foreground">
                     <span
                       className={cn(
                         "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
-                        item.result === "Pending"
+                        item.status === "Pending"
                           ? "bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-300"
                           : "bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300",
                       )}
                     >
-                      {item.result}
+                      {item.match_team1_score !== undefined &&
+                      item.match_team2_score !== undefined
+                        ? `${item.match_team1_score} - ${item.match_team2_score}`
+                        : item.result || "Pending"}
                     </span>
                   </td>
                 </tr>

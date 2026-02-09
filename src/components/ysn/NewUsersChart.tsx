@@ -21,6 +21,7 @@ import { Loader2, UserPlus } from "lucide-react";
 import {
   getYSNOrganizerNewUserGrowth,
   type NewUserGrowthData,
+  type NewUserGrowthItem,
 } from "@/lib/api/ysn-organizer";
 
 // Fallback data removed
@@ -29,7 +30,7 @@ export const NewUsersChart = () => {
   const [timeRange, setTimeRange] = useState<"day" | "week" | "month" | "year">(
     "month",
   );
-  const [apiData, setApiData] = useState<NewUserGrowthData[]>([]);
+  const [apiData, setApiData] = useState<NewUserGrowthData | null>(null);
   const [loading, setLoading] = useState(true);
   const [hasData, setHasData] = useState(false);
 
@@ -38,11 +39,12 @@ export const NewUsersChart = () => {
       try {
         setLoading(true);
         const response = await getYSNOrganizerNewUserGrowth();
-        if (response.status && response.data && response.data.length > 0) {
+        if (response.status && response.data) {
           setApiData(response.data);
           setHasData(true);
         } else {
           setHasData(false);
+          setApiData(null);
         }
       } catch (error) {
         console.error("Failed to fetch new user growth data:", error);
@@ -57,10 +59,10 @@ export const NewUsersChart = () => {
 
   // Transform API data or use fallback
   const getChartData = () => {
-    if (hasData && apiData.length > 0) {
-      return apiData.map((item) => ({
+    if (hasData && apiData && apiData[timeRange]) {
+      return apiData[timeRange].map((item: NewUserGrowthItem) => ({
         name: String(item.label),
-        value: item.value,
+        value: item.total,
       }));
     }
     return [];
@@ -94,7 +96,7 @@ export const NewUsersChart = () => {
             </p>
             <p className="text-xs text-muted-foreground">Total this period</p>
           </div>
-          {!hasData && (
+          {hasData && (
             <Select
               value={timeRange}
               onValueChange={(val: "day" | "week" | "month" | "year") =>

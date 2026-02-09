@@ -12,25 +12,39 @@ export const getYSNOrganizerCount = async () => {
 };
 
 // ===== New User Growth =====
-export interface NewUserGrowthData {
+export interface NewUserGrowthItem {
   label: string | number;
-  value: number;
+  total: number;
+}
+
+export interface NewUserGrowthData {
+  day: NewUserGrowthItem[];
+  week: NewUserGrowthItem[];
+  month: NewUserGrowthItem[];
+  year: NewUserGrowthItem[];
 }
 
 export const getYSNOrganizerNewUserGrowth = async () => {
-  return apiClient<NewUserGrowthData[]>("/api/ysn/organizer/new-user-growth");
+  return apiClient<NewUserGrowthData>("/api/ysn/organizer/new-user-growth");
 };
 
 // ===== Matches =====
 export interface Match {
   id?: number;
   match?: string;
+  // API fields
+  team_name?: string;
+  opt_team_name?: string;
+  match_team1_score?: number;
+  match_team2_score?: number;
+  // Legacy/Fallback fields
   team1?: string;
   team2?: string;
+
   league?: string;
   date?: string;
   time?: string;
-  viewers?: string;
+  viewers?: number; // changed from string to number based on API (0)
   result?: string;
   status?: string;
 }
@@ -53,6 +67,7 @@ export interface MatchStatisticsData {
 }
 
 export const getYSNOrganizerMatchStatistics = async () => {
+  // api returns array of objects directly
   return apiClient<MatchStatisticsData[]>(
     "/api/ysn/organizer/match-statistics",
   );
