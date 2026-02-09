@@ -49,18 +49,13 @@ function getFilteredNavSections(
       // Rivalis visibility
       if (label === "rivalis") return user.is_rivalis;
 
-      // Other items (Connected, ADP, Chase, YouTube, Google Analytics)
-      // These are hidden for non-admin users unless they have specific access
-      // For now, admins see them, others don't
-      if (
-        [
-          "connected",
-          "adp",
-          "chase",
-          "youtube data",
-          "google analytics",
-        ].includes(label)
-      ) {
+      // YouTube Data and Google Analytics are visible to all users
+      if (["youtube data", "google analytics"].includes(label)) {
+        return true;
+      }
+
+      // Other items (Connected, ADP, Chase) are admin-only
+      if (["connected", "adp", "chase"].includes(label)) {
         return user.role === "admin";
       }
 
