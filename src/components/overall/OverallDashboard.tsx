@@ -318,12 +318,51 @@ const parseNumber = (str: string) => {
   return num * multiplier;
 };
 
+// Helper: filter projects based on user permissions
+function getPermittedProjects(
+  allProjects: typeof projects,
+  user: ReturnType<typeof useAuthStore.getState>["user"],
+) {
+  if (!user) return allProjects;
+
+  // Admin users see everything
+  if (user.user_type === 1 || user.role === "admin") return allProjects;
+
+  return allProjects.filter((p) => {
+    switch (p.id) {
+      case "battle-lounge":
+        return user.is_battlelounge;
+      case "ysn":
+        return user.is_ysn;
+      case "destination-kp":
+        return user.is_dkp;
+      case "rivalis":
+        return user.is_rivalis;
+      default:
+        return true;
+    }
+  });
+}
+
 export const OverallDashboard = () => {
   const { user } = useAuthStore();
   const role = user?.role || "organizer";
 
-  const [projectData, setProjectData] = useState(projects);
+  // Only include projects the user has permission to view
+  const permittedProjects = getPermittedProjects(projects, user);
+
+  const [projectData, setProjectData] = useState(permittedProjects);
   const [statsData, setStatsData] = useState(initialOverallStats);
+
+  // Re-compute permitted projects when user changes
+  useEffect(() => {
+    setProjectData(getPermittedProjects(projects, user));
+  }, [user]);
+
+  // Check if user has access to each product
+  const hasYSN = permittedProjects.some((p) => p.id === "ysn");
+  const hasBL = permittedProjects.some((p) => p.id === "battle-lounge");
+  const hasDKP = permittedProjects.some((p) => p.id === "destination-kp");
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -332,8 +371,10 @@ export const OverallDashboard = () => {
         let blData: any = {};
         let dkpData: any = {};
 
-        // --- Fetch YSN Data ---
-        if (role === "admin") {
+        // --- Fetch YSN Data (only if user has permission) ---
+        if (!hasYSN) {
+          // Skip fetching YSN data
+        } else if (role === "admin") {
           const [countRes, revenueTrendRes, usersAcqRes] = await Promise.all([
             getYSNAdminCount(),
             getYSNAdminTotalRevenueTrends(),
@@ -412,131 +453,136 @@ export const OverallDashboard = () => {
           };
         }
 
-        // --- Fetch Destination KP Data ---
-        // --- Fetch Destination KP Data ---
-        try {
-          const [
-            dkpCountRes,
-            dkpRevenueRes,
-            dkpJobsRes,
-            dkpEventsRes,
-            dkpAdRevenueRes,
-            dkpAttendanceRes,
-          ] = await Promise.all([
-            getDKPCount(),
-            getDKPRevenue(),
-            getActiveJobs(),
-            getUpcomingEvents(),
-            getPageAdRevenue(),
-            getEventAttendanceTrends(),
-          ]);
+        // --- Fetch Destination KP Data (only if user has permission) ---
+        if (hasDKP)
+          try {
+            const [
+              dkpCountRes,
+              dkpRevenueRes,
+              dkpJobsRes,
+              dkpEventsRes,
+              dkpAdRevenueRes,
+              dkpAttendanceRes,
+            ] = await Promise.all([
+              getDKPCount(),
+              getDKPRevenue(),
+              getActiveJobs(),
+              getUpcomingEvents(),
+              getPageAdRevenue(),
+              getEventAttendanceTrends(),
+            ]);
 
-          const dkpRevenue = dkpRevenueRes.data;
-          // Only sum actual users (Visitors + Subscribers)
-          const dkpUsers = dkpCountRes.data
-            .filter((i: any) => ["Visitors", "Subscribers"].includes(i.label))
-            .reduce((acc: number, curr: any) => acc + curr.count, 0);
+            const dkpRevenue = dkpRevenueRes.data;
+            // Only sum actual users (Visitors + Subscribers)
+            const dkpUsers = dkpCountRes.data
+              .filter((i: any) => ["Visitors", "Subscribers"].includes(i.label))
+              .reduce((acc: number, curr: any) => acc + curr.count, 0);
 
-          const contactReqCount =
-            dkpCountRes.data.find((i: any) => i.label === "Contact Req")
-              ?.count || 0;
+            const contactReqCount =
+              dkpCountRes.data.find((i: any) => i.label === "Contact Req")
+                ?.count || 0;
 
-          const activeJobsCount = dkpJobsRes.data.length;
-          const upcomingEventsCount = dkpEventsRes.data.length;
-          const adRevenueTotal = dkpAdRevenueRes.data.total;
+            const activeJobsCount = dkpJobsRes.data.length;
+            const upcomingEventsCount = dkpEventsRes.data.length;
+            const adRevenueTotal = dkpAdRevenueRes.data.total;
 
-          const totalAttendees = dkpAttendanceRes.data.reduce(
-            (acc: number, curr: any) => acc + curr.attendees,
-            0,
-          );
+            const totalAttendees = dkpAttendanceRes.data.reduce(
+              (acc: number, curr: any) => acc + curr.attendees,
+              0,
+            );
 
-          const projectedAttendees = dkpAttendanceRes.data.reduce(
-            (acc: number, curr: any) => acc + curr.projected,
-            0,
-          );
+            const projectedAttendees = dkpAttendanceRes.data.reduce(
+              (acc: number, curr: any) => acc + curr.projected,
+              0,
+            );
 
-          const revenueChartData = dkpRevenue.data.map((d: any) => d.value);
+            const revenueChartData = dkpRevenue.data.map((d: any) => d.value);
 
-          dkpData = {
-            users: formatNumber(dkpUsers),
-            revenue: formatCurrency(dkpRevenue.total_amt),
-            revenueGrowth:
-              dkpRevenue.growth_percentage > 0
-                ? `+${dkpRevenue.growth_percentage}%`
-                : `${dkpRevenue.growth_percentage}%`,
-            data:
-              revenueChartData.length > 0
-                ? revenueChartData
-                : [0, 0, 0, 0, 0, 0, 0],
-            stats: {
-              primaryMetrics: [
-                {
-                  label: "Active Jobs",
-                  value: activeJobsCount.toString(),
-                  icon: Briefcase,
-                  highlight: true,
-                },
-                {
-                  label: "Upcoming Events",
-                  value: upcomingEventsCount.toString(),
-                  icon: Calendar,
-                },
-                // Replaced Destinations (No API) with Ad Revenue (Real API)
-                {
-                  label: "Ad Revenue",
-                  value: formatCurrency(adRevenueTotal), // e.g. $160k
-                  icon: DollarSign,
-                },
-                // Replaced Hardcoded Contact Requests with Real API
-                {
-                  label: "Contact Requests",
-                  value: contactReqCount.toString(),
-                  icon: Users,
-                },
-              ],
-              topGames: [
-                {
-                  name: "Tourism Packages",
-                  players: formatCurrency(dkpRevenue.tourism),
-                  percentage: (dkpRevenue.tourism / dkpRevenue.total_amt) * 100,
-                },
-                {
-                  name: "Event Bookings",
-                  players: formatCurrency(dkpRevenue.events),
-                  percentage: (dkpRevenue.events / dkpRevenue.total_amt) * 100,
-                },
-                {
-                  name: "Facility Rentals",
-                  players: formatCurrency(dkpRevenue.facilities),
-                  percentage:
-                    (dkpRevenue.facilities / dkpRevenue.total_amt) * 100,
-                },
-              ],
-              quickStats: [
-                {
-                  label: "Total Attendees",
-                  value: formatNumber(totalAttendees),
-                  change: `Year to Date`,
-                },
-                {
-                  label: "Projected",
-                  value: formatNumber(projectedAttendees),
-                  change: "Year End",
-                },
-                {
-                  label: "Avg. Job Apps",
-                  // Simple average derived from active jobs if available, else 0
-                  value: dkpJobsRes.data.length > 0 ? "0" : "0",
-                  change: "Per Job",
-                },
-              ],
-            },
-          };
-        } catch (dkpError) {
-          console.error("Failed to fetch DKP data", dkpError);
-        }
+            dkpData = {
+              users: formatNumber(dkpUsers),
+              revenue: formatCurrency(dkpRevenue.total_amt),
+              revenueGrowth:
+                dkpRevenue.growth_percentage > 0
+                  ? `+${dkpRevenue.growth_percentage}%`
+                  : `${dkpRevenue.growth_percentage}%`,
+              data:
+                revenueChartData.length > 0
+                  ? revenueChartData
+                  : [0, 0, 0, 0, 0, 0, 0],
+              stats: {
+                primaryMetrics: [
+                  {
+                    label: "Active Jobs",
+                    value: activeJobsCount.toString(),
+                    icon: Briefcase,
+                    highlight: true,
+                  },
+                  {
+                    label: "Upcoming Events",
+                    value: upcomingEventsCount.toString(),
+                    icon: Calendar,
+                  },
+                  // Replaced Destinations (No API) with Ad Revenue (Real API)
+                  {
+                    label: "Ad Revenue",
+                    value: formatCurrency(adRevenueTotal), // e.g. $160k
+                    icon: DollarSign,
+                  },
+                  // Replaced Hardcoded Contact Requests with Real API
+                  {
+                    label: "Contact Requests",
+                    value: contactReqCount.toString(),
+                    icon: Users,
+                  },
+                ],
+                topGames: [
+                  {
+                    name: "Tourism Packages",
+                    players: formatCurrency(dkpRevenue.tourism),
+                    percentage:
+                      (dkpRevenue.tourism / dkpRevenue.total_amt) * 100,
+                  },
+                  {
+                    name: "Event Bookings",
+                    players: formatCurrency(dkpRevenue.events),
+                    percentage:
+                      (dkpRevenue.events / dkpRevenue.total_amt) * 100,
+                  },
+                  {
+                    name: "Facility Rentals",
+                    players: formatCurrency(dkpRevenue.facilities),
+                    percentage:
+                      (dkpRevenue.facilities / dkpRevenue.total_amt) * 100,
+                  },
+                ],
+                quickStats: [
+                  {
+                    label: "Total Attendees",
+                    value: formatNumber(totalAttendees),
+                    change: `Year to Date`,
+                  },
+                  {
+                    label: "Projected",
+                    value: formatNumber(projectedAttendees),
+                    change: "Year End",
+                  },
+                  {
+                    label: "Avg. Job Apps",
+                    // Simple average derived from active jobs if available, else 0
+                    value: dkpJobsRes.data.length > 0 ? "0" : "0",
+                    change: "Per Job",
+                  },
+                ],
+              },
+            };
+          } catch (dkpError) {
+            console.error("Failed to fetch DKP data", dkpError);
+          } // end if(hasDKP)
 
-        if (role === "admin") {
+        // --- Fetch Battle Lounge Data (only if user has permission) ---
+        if (!hasBL) {
+          // Skip fetching BL data
+        } else if (role === "admin") {
           const [
             countRes,
             growthRes,
@@ -781,8 +827,8 @@ export const OverallDashboard = () => {
             },
           };
         }
-        // --- Update Projects State ---
-        const updatedProjects = projects.map((p) => {
+        // --- Update Projects State (only permitted projects) ---
+        const updatedProjects = permittedProjects.map((p) => {
           if (p.id === "ysn") {
             return {
               ...p,
@@ -832,7 +878,7 @@ export const OverallDashboard = () => {
 
         setProjectData(updatedProjects);
 
-        // --- Recalculate Overall Stats ---
+        // --- Recalculate Overall Stats (only from permitted projects) ---
         const totalRev = updatedProjects.reduce(
           (acc, curr) => acc + parseCurrency(curr.revenue),
           0,
@@ -848,6 +894,12 @@ export const OverallDashboard = () => {
               return { ...s, value: formatCurrency(totalRev) };
             if (s.title === "Total Users")
               return { ...s, value: formatNumber(totalUsr) };
+            if (s.title === "Active Projects")
+              return {
+                ...s,
+                value: updatedProjects.length.toString(),
+                change: "+0",
+              };
             return s;
           }),
         );
@@ -857,7 +909,7 @@ export const OverallDashboard = () => {
     };
 
     fetchDashboardData();
-  }, [role]);
+  }, [role, hasYSN, hasBL, hasDKP, user]);
 
   // Helper to get dynamic href based on role
   const getProjectHref = (projectId: string, defaultHref: string) => {
