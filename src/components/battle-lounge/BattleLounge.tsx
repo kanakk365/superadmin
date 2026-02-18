@@ -18,6 +18,7 @@ import {
   getLiveTournamentDetails,
   getReachImpression,
   getOrganizerUsers,
+  getNewUsersStats,
   OrganizerStats,
   StatusBasedTournaments,
   PopularGamesData,
@@ -25,6 +26,7 @@ import {
   Tournament,
   ReachImpressionData,
   OrganizerUsersData,
+  NewUsersData,
 } from "@/lib/api/battle-lounge/organizer";
 import { Loader2 } from "lucide-react";
 
@@ -48,6 +50,9 @@ export const BattleLounge = () => {
   const [usersData, setUsersData] = useState<OrganizerUsersData | undefined>(
     undefined,
   );
+  const [newUsersData, setNewUsersData] = useState<NewUsersData | undefined>(
+    undefined,
+  );
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -64,6 +69,7 @@ export const BattleLounge = () => {
           liveDetailsRes,
           reachRes,
           usersRes,
+          newUsersRes,
         ] = await Promise.all([
           getOrganizerStats(),
           getStatusBasedTournaments(),
@@ -72,6 +78,7 @@ export const BattleLounge = () => {
           getLiveTournamentDetails(),
           getReachImpression(),
           getOrganizerUsers(),
+          getNewUsersStats(),
         ]);
 
         if (statsRes.status) setStats(statsRes.data);
@@ -82,6 +89,7 @@ export const BattleLounge = () => {
         if (liveDetailsRes.status) setLiveDetails(liveDetailsRes.data);
         if (reachRes.status) setReachData(reachRes.data);
         if (usersRes.status) setUsersData(usersRes.data);
+        if (newUsersRes.status) setNewUsersData(newUsersRes.data);
       } catch (err) {
         console.error("Failed to fetch battle lounge data", err);
         setError("Failed to load dashboard data");
@@ -137,7 +145,7 @@ export const BattleLounge = () => {
 
         {/* New Users Chart - Day/Week/Month/Year */}
         <div className="grid lg:grid-cols-2 gap-6 lg:gap-8">
-          <NewUsersChart />
+          <NewUsersChart data={newUsersData} />
           <TournamentsStatsChart stats={tournamentStats} />
         </div>
 

@@ -104,6 +104,23 @@ export interface OrganizerUsersData {
   totalOrganizerPlayer: UserCount;
 }
 
+export interface NewUserStats {
+  label: string;
+  total: number;
+}
+
+export interface NewUserPeriodStats {
+  total_created: number;
+  data: NewUserStats[];
+}
+
+export interface NewUsersData {
+  days: NewUserPeriodStats;
+  weeks: NewUserPeriodStats;
+  months: NewUserPeriodStats;
+  years: NewUserPeriodStats;
+}
+
 // New API Functions
 export const getTournamentStatistics = async () => {
   return apiClient<TournamentStatistics>(
@@ -125,4 +142,8 @@ export const getReachImpression = async () => {
 
 export const getOrganizerUsers = async () => {
   return apiClient<OrganizerUsersData>("/api/battle-lounge/organizer/users");
+};
+
+export const getNewUsersStats = async () => {
+  return apiClient<NewUsersData>("/api/battle-lounge/organizer/new-users");
 };
