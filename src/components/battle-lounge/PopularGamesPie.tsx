@@ -69,7 +69,12 @@ export function PopularGamesPie({ data }: PopularGamesPieProps) {
     // Since we don't know exact structure, we try common fields.
     return data.games.map((g: any, index) => ({
       game: g.game_name || g.name || "Unknown",
-      players: g.players || 0,
+      players:
+        g.players !== undefined
+          ? g.players
+          : g.total !== undefined
+            ? g.total
+            : 0,
       fill: COLORS[index % COLORS.length],
     }));
   }, [data]);
