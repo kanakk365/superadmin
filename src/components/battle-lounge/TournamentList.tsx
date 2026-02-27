@@ -10,6 +10,8 @@ import {
   Crosshair,
   Eye,
   ExternalLink,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import {
   TournamentDetailModal,
@@ -92,6 +94,14 @@ export const TournamentList = ({
   const [selectedTournament, setSelectedTournament] =
     React.useState<TournamentDetail | null>(null);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [currentPage, setCurrentPage] = React.useState(1);
+
+  const itemsPerPage = 10;
+
+  // Reset page when filter changes
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [filter]);
 
   const currentList = React.useMemo(() => {
     if (filter === "live") return live;
@@ -100,6 +110,12 @@ export const TournamentList = ({
   }, [filter, upcoming, live, completed]);
 
   const filteredTournaments = currentList.map(mapTournamentToDetail);
+
+  const totalPages = Math.ceil(filteredTournaments.length / itemsPerPage) || 1;
+  const paginatedTournaments = filteredTournaments.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage,
+  );
 
   const handleViewDetails = (tournament: TournamentDetail) => {
     setSelectedTournament(tournament);
@@ -160,97 +176,149 @@ export const TournamentList = ({
           </div>
         </div>
 
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-auto flex flex-col">
           {filteredTournaments.length > 0 ? (
-            <div className="flex flex-col p-4 gap-2">
-              {filteredTournaments.map((t) => {
-                const Icon = getGameIcon(t.game);
-                const bg = getGameBg(t.game);
+            <>
+              <div className="flex flex-col p-4 gap-2 flex-grow">
+                {paginatedTournaments.map((t) => {
+                  const Icon = getGameIcon(t.game);
+                  const bg = getGameBg(t.game);
 
-                return (
-                  <div
-                    key={t.id}
-                    onClick={() => handleViewDetails(t)}
-                    className="group flex items-center justify-between p-4 rounded-2xl hover:bg-muted/40 border border-transparent hover:border-border/40 transition-all duration-200 cursor-pointer"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div
-                        className={cn("p-3 rounded-2xl transition-colors", bg)}
-                      >
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        <span className="font-semibold text-foreground group-hover:text-primary transition-colors">
-                          {t.name}
-                        </span>
-                        <span className="text-xs font-medium text-muted-foreground">
-                          {t.game}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-6 md:gap-12">
-                      <div className="hidden md:flex flex-col items-end gap-1 min-w-[80px]">
-                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                          Prize Pool
-                        </span>
-                        <span className="font-bold text-foreground">
-                          {t.prizeAmount}
-                        </span>
-                      </div>
-
-                      <div className="hidden lg:flex flex-col items-end gap-1 min-w-[70px]">
-                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                          Players
-                        </span>
-                        <span className="font-bold text-foreground">
-                          {t.totalPlayers}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-4 min-w-[140px] justify-end">
-                        <span
+                  return (
+                    <div
+                      key={t.id}
+                      onClick={() => handleViewDetails(t)}
+                      className="group flex items-center justify-between p-4 rounded-2xl hover:bg-muted/40 border border-transparent hover:border-border/40 transition-all duration-200 cursor-pointer"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div
                           className={cn(
-                            "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold border",
-                            t.status === "live" &&
-                              "bg-fuchsia-500/10 text-fuchsia-600 border-fuchsia-500/20 dark:text-fuchsia-400",
-                            t.status === "upcoming" &&
-                              "bg-purple-500/10 text-purple-600 border-purple-500/20 dark:text-purple-400",
-                            t.status === "completed" &&
-                              "bg-muted text-muted-foreground border-border",
+                            "p-3 rounded-2xl transition-colors",
+                            bg,
                           )}
                         >
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <span className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                            {t.name}
+                          </span>
+                          <span className="text-xs font-medium text-muted-foreground">
+                            {t.game}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-6 md:gap-12">
+                        <div className="hidden md:flex flex-col items-end gap-1 min-w-[80px]">
+                          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                            Prize Pool
+                          </span>
+                          <span className="font-bold text-foreground">
+                            {t.prizeAmount}
+                          </span>
+                        </div>
+
+                        <div className="hidden lg:flex flex-col items-end gap-1 min-w-[70px]">
+                          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                            Players
+                          </span>
+                          <span className="font-bold text-foreground">
+                            {t.totalPlayers}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-4 min-w-[140px] justify-end">
                           <span
                             className={cn(
-                              "w-1.5 h-1.5 rounded-full",
+                              "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold border",
                               t.status === "live" &&
-                                "bg-fuchsia-500 animate-pulse",
-                              t.status === "upcoming" && "bg-purple-500",
-                              t.status === "completed" && "bg-muted-foreground",
+                                "bg-fuchsia-500/10 text-fuchsia-600 border-fuchsia-500/20 dark:text-fuchsia-400",
+                              t.status === "upcoming" &&
+                                "bg-purple-500/10 text-purple-600 border-purple-500/20 dark:text-purple-400",
+                              t.status === "completed" &&
+                                "bg-muted text-muted-foreground border-border",
                             )}
-                          ></span>
-                          {t.status === "live"
-                            ? "Live Now"
-                            : t.status === "upcoming"
-                              ? "Upcoming"
-                              : "Completed"}
-                        </span>
+                          >
+                            <span
+                              className={cn(
+                                "w-1.5 h-1.5 rounded-full",
+                                t.status === "live" &&
+                                  "bg-fuchsia-500 animate-pulse",
+                                t.status === "upcoming" && "bg-purple-500",
+                                t.status === "completed" &&
+                                  "bg-muted-foreground",
+                              )}
+                            ></span>
+                            {t.status === "live"
+                              ? "Live Now"
+                              : t.status === "upcoming"
+                                ? "Upcoming"
+                                : "Completed"}
+                          </span>
 
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleViewDetails(t);
-                          }}
-                          className="p-2 rounded-lg hover:bg-muted transition-colors opacity-0 group-hover:opacity-100"
-                        >
-                          <Eye className="w-4 h-4 text-muted-foreground" />
-                        </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleViewDetails(t);
+                            }}
+                            className="p-2 rounded-lg hover:bg-muted transition-colors opacity-0 group-hover:opacity-100"
+                          >
+                            <Eye className="w-4 h-4 text-muted-foreground" />
+                          </button>
+                        </div>
                       </div>
                     </div>
+                  );
+                })}
+              </div>
+
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between px-6 py-4 border-t border-border/40 bg-muted/10 mt-auto">
+                  <div className="text-sm text-muted-foreground">
+                    Showing{" "}
+                    <span className="font-medium text-foreground">
+                      {(currentPage - 1) * itemsPerPage + 1}
+                    </span>{" "}
+                    to{" "}
+                    <span className="font-medium text-foreground">
+                      {Math.min(
+                        currentPage * itemsPerPage,
+                        filteredTournaments.length,
+                      )}
+                    </span>{" "}
+                    of{" "}
+                    <span className="font-medium text-foreground">
+                      {filteredTournaments.length}
+                    </span>{" "}
+                    results
                   </div>
-                );
-              })}
-            </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg border border-border/40 hover:bg-muted/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium text-foreground"
+                    >
+                      <ChevronLeft className="w-4 h-4 mr-1" />
+                      Previous
+                    </button>
+                    <div className="text-sm font-medium px-2 text-foreground">
+                      Page {currentPage} of {totalPages}
+                    </div>
+                    <button
+                      onClick={() =>
+                        setCurrentPage((p) => Math.min(totalPages, p + 1))
+                      }
+                      disabled={currentPage === totalPages}
+                      className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg border border-border/40 hover:bg-muted/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium text-foreground"
+                    >
+                      Next
+                      <ChevronRight className="w-4 h-4 ml-1" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
           ) : (
             <div className="h-full flex items-center justify-center p-4">
               <span className="text-muted-foreground">
