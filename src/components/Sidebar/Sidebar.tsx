@@ -121,12 +121,12 @@ const SidebarComponent = () => {
   return (
     <SidebarRoot open={isSidebarOpen} setOpen={handleSetOpen} animate>
       <SidebarBody className=" border-r border-border bg-sidebar h-screen max-h-screen">
-        <div className="flex items-center h-16 px-5 border-b border-border">
+        <div className="flex items-center h-16 px-5 border-b border-border overflow-hidden">
           <Link
             href="/overall"
-            className="text-2xl font-medium text-sidebar-foreground hover:opacity-80 transition-opacity"
+            className="text-2xl font-medium text-sidebar-foreground hover:opacity-80 transition-opacity whitespace-nowrap overflow-hidden"
           >
-            Oneplace
+            {isSidebarOpen ? "Oneplace" : "O"}
           </Link>
         </div>
         <ScrollArea className=" pt-6 pr-4 h-[calc(100vh-64px)] max-h-[calc(100vh-64px)]">

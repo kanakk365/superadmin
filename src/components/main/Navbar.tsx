@@ -5,9 +5,7 @@ import { motion } from "motion/react";
 import { AnimatePresence } from "motion/react";
 import {
   IconBell,
-  IconClock,
   IconMenu,
-  IconSearch,
   IconStar,
   IconSun,
 } from "@/lib/icons";
@@ -79,13 +77,7 @@ const Navbar = ({ sectionLabel, pageLabel }: NavbarProps) => {
     }
   }, [isLoaded, triggerAnimation, toggleTheme]);
 
-  const handleClockClick = useCallback(() => {
-    triggerAnimation("clock");
-  }, [triggerAnimation]);
 
-  const handleSearchClick = useCallback(() => {
-    triggerAnimation("search");
-  }, [triggerAnimation]);
 
   return (
     <header className="flex h-16 items-center justify-between border-b border-border bg-background px-4 sm:px-8 sm:pl-4">
@@ -108,37 +100,7 @@ const Navbar = ({ sectionLabel, pageLabel }: NavbarProps) => {
       </div>
 
       <div className="flex items-center gap-5">
-        <div className="relative hidden sm:block">
-          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center">
-            <motion.div
-              animate={
-                isAnimating("search")
-                  ? { opacity: [1, 0.5, 1] }
-                  : { opacity: 1 }
-              }
-              transition={{ duration: 0.6, ease: "easeOut" }}
-            >
-              <IconSearch />
-            </motion.div>
-          </span>
-          <input
-            type="text"
-            placeholder="Search"
-            onClick={handleSearchClick}
-            className="h-10 w-60 rounded-lg bg-muted pl-10 pr-20 text-sm text-foreground outline-none transition focus:border-primary"
-          />
-          <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">
-            <span className="text-muted-foreground">⌘/</span>
-          </span>
-        </div>
-        <motion.button
-          onClick={handleClockClick}
-          animate={isAnimating("clock") ? { rotate: [0, 360] } : { rotate: 0 }}
-          transition={{ duration: 0.6, ease: "easeInOut" }}
-          className="grid place-items-center text-foreground transition cursor-pointer"
-        >
-          <IconClock />
-        </motion.button>
+
         <motion.button
           onClick={handleThemeToggle}
           transition={{ duration: 0.3, ease: "easeInOut" }}
